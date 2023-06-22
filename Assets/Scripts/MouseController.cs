@@ -11,7 +11,8 @@ public class MouseController : MonoBehaviour
 
     }
     public GameObject cursor;
-
+    private CharacterInfo character;
+    public GameObject characterPrefab;
     // Update is called once per frame
     void LateUpdate()
     {
@@ -28,6 +29,12 @@ public class MouseController : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 overlayTile.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+
+                if (character == null)
+                {
+                    character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
+                    PositionCharacterOnTine(overlayTile);
+                }
             }
         }
     }
@@ -43,5 +50,12 @@ public class MouseController : MonoBehaviour
             return hits.OrderByDescending(i => i.collider.transform.position.z).First();
         }
         return null;
+    }
+
+    private void PositionCharacterOnTine(GameObject tile) 
+    {
+        character.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y + 0.5f, tile.transform.position.z+2);
+        character.GetComponent<SpriteRenderer>().sortingOrder = tile.GetComponent<SpriteRenderer>().sortingOrder + 1;
+        character.activeTile = tile;
     }
 }
