@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class CharacterInfo : MonoBehaviour
 {
-    public GameObject activeTile;
+    public OverlayTile standingOnTile;
 }

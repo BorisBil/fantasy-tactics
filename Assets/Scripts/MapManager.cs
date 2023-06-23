@@ -11,22 +11,26 @@ public class MapManager : MonoBehaviour
     public GameObject overlayTilePrefab;
     public GameObject overlayContainer;
 
-    public Dictionary<Vector2Int, GameObject> map;
+    public Dictionary<Vector2Int, OverlayTile> map;
     public bool ignoreBottomTiles = false;
+    
     private void Awake()
     {
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);
-        } else {
+        } 
+        else 
+        {
             _instance = this;
         }
     }
+    
     // Start is called before the first frame update
     void Start()
     {
         var tileMap = gameObject.GetComponentInChildren<Tilemap>();
-        map = new Dictionary<Vector2Int, GameObject>();
+        map = new Dictionary<Vector2Int, OverlayTile>();
 
         BoundsInt bounds = tileMap.cellBounds;
 
@@ -45,9 +49,12 @@ public class MapManager : MonoBehaviour
                     {
                         var overlayTile = Instantiate(overlayTilePrefab, overlayContainer.transform);
                         var cellWorldPosition = tileMap.GetCellCenterWorld(tileLocation);
+                        
                         overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z+1);
                         overlayTile.GetComponent<SpriteRenderer>().sortingOrder = tileMap.GetComponent<TilemapRenderer>().sortingOrder;
-                        map.Add(tileKey, overlayTile);
+                        overlayTile.gameObject.GetComponent<OverlayTile>().gridLocation = new Vector3Int(x, y, z);
+
+                        map.Add(new Vector2Int(x, y), overlayTile.gameObject.GetComponent<OverlayTile>());
                     }
                 }
             }

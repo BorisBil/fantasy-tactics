@@ -2,17 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 
 public class MouseController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
     public GameObject cursor;
+    public float speed;
     private CharacterInfo character;
     public GameObject characterPrefab;
+
+    private Pathfinder pathFinder;
+    private List<OverlayTile> path;
+
+    private void Start()
+    {
+        pathFinder = new Pathfinder();
+        path = new List<OverlayTile>();
+    }
+
     // Update is called once per frame
     void LateUpdate()
     {
@@ -20,42 +27,71 @@ public class MouseController : MonoBehaviour
 
         if (hit.HasValue)
         {
-            GameObject overlayTile = hit.Value.collider.gameObject;
-            cursor.transform.position = overlayTile.transform.position;
-            cursor.transform.position = new Vector3(cursor.transform.position.x, cursor.transform.position.y, cursor.transform.position.z + 1);
-            Debug.Log(cursor.transform.position == overlayTile.transform.position);
-            cursor.GetComponent<SpriteRenderer>().sortingOrder = overlayTile.GetComponent<SpriteRenderer>().sortingOrder + 1;
+            OverlayTile tile = hit.Value.collider.gameObject.GetComponent<OverlayTile>();
+            
+            cursor.transform.position = tile.transform.position;
+
+            cursor.gameObject.GetComponent<SpriteRenderer>().sortingOrder = tile.transform.GetComponent<SpriteRenderer>().sortingOrder;
 
             if (Input.GetMouseButtonDown(0))
             {
-                overlayTile.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                tile.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
 
                 if (character == null)
                 {
                     character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
-                    PositionCharacterOnTine(overlayTile);
+                    PositionCharacterOnLine(tile);
+                    character.standingOnTile = tile;
+                } 
+                else
+                {
+                    path = pathFinder.FindPath(character.standingOnTile, tile);
+
+                    tile.gameObject.GetComponent<OverlayTile>().HideTile();
                 }
             }
         }
+
+        if (path.Count > 0)
+        {
+            MoveAlongPath();
+        }
     }
-    public RaycastHit2D? GetFocusedOnTile()
+
+    private void MoveAlongPath()
+    {
+        var step = speed * Time.deltaTime;
+
+        float zIndex = path[0].transform.position.z;
+        character.transform.position = Vector2.MoveTowards(character.transform.position, path[0].transform.position, step);
+        character.transform.position = new Vector3(character.transform.position.x, character.transform.position.y, zIndex);
+
+        if (Vector2.Distance(character.transform.position, path[0].transform.position) < 0.00001f)
+        {
+            PositionCharacterOnLine(path[0]);
+            path.RemoveAt(0);
+        }
+    }
+
+    private static RaycastHit2D? GetFocusedOnTile()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 mousePos2d = new Vector2(mousePos.x, mousePos.y);
-    
-        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos2d, Vector2.zero);
-        // Debug.Log(hits.Length);
-        if (hits.Length > 0) 
+        Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos2D, Vector2.zero);
+
+        if (hits.Length > 0)
         {
             return hits.OrderByDescending(i => i.collider.transform.position.z).First();
         }
+
         return null;
     }
 
-    private void PositionCharacterOnTine(GameObject tile) 
+    private void PositionCharacterOnLine(OverlayTile tile)
     {
-        character.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y + 0.5f, tile.transform.position.z+2);
+        character.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y + 0.05f, tile.transform.position.z);
         character.GetComponent<SpriteRenderer>().sortingOrder = tile.GetComponent<SpriteRenderer>().sortingOrder + 1;
-        character.activeTile = tile;
+        character.standingOnTile = tile;
     }
 }
