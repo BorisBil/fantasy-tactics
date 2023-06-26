@@ -12,12 +12,15 @@ public class MouseController : MonoBehaviour
     public GameObject characterPrefab;
 
     private Pathfinder pathFinder;
-    private List<OverlayTile> path;
+    private Rangefinder rangeFinder;
+    private List<OverlayTile> path = new List<OverlayTile>();
+    private List<OverlayTile> inRangeTiles = new List<OverlayTile>();
 
     private void Start()
     {
         pathFinder = new Pathfinder();
         path = new List<OverlayTile>();
+        rangeFinder = new Rangefinder();
     }
 
     // Update is called once per frame
@@ -42,6 +45,7 @@ public class MouseController : MonoBehaviour
                     character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
                     PositionCharacterOnLine(tile);
                     character.standingOnTile = tile;
+                    GetInRangeTiles();
                 } 
                 else
                 {
@@ -58,6 +62,21 @@ public class MouseController : MonoBehaviour
         }
     }
 
+    private void GetInRangeTiles()
+    {
+        inRangeTiles = rangeFinder.GetTilesInRange(character.standingOnTile, 3);
+
+        foreach (var item in inRangeTiles)
+        {
+            item.HideTile();
+        }
+
+        foreach (var item in inRangeTiles)
+        {
+            item.ShowTile();
+        }
+    }
+
     private void MoveAlongPath()
     {
         var step = speed * Time.deltaTime;
@@ -70,6 +89,11 @@ public class MouseController : MonoBehaviour
         {
             PositionCharacterOnLine(path[0]);
             path.RemoveAt(0);
+        }
+
+        if (path.Count == 0)
+        {
+            GetInRangeTiles();
         }
     }
 
@@ -90,7 +114,7 @@ public class MouseController : MonoBehaviour
 
     private void PositionCharacterOnLine(OverlayTile tile)
     {
-        character.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y + 0.05f, tile.transform.position.z);
+        character.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z);
         character.GetComponent<SpriteRenderer>().sortingOrder = tile.GetComponent<SpriteRenderer>().sortingOrder + 1;
         character.standingOnTile = tile;
     }

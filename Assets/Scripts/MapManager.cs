@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class MapManager : MonoBehaviour
 {
@@ -50,7 +51,7 @@ public class MapManager : MonoBehaviour
                         var overlayTile = Instantiate(overlayTilePrefab, overlayContainer.transform);
                         var cellWorldPosition = tileMap.GetCellCenterWorld(tileLocation);
                         
-                        overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z+1);
+                        overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z + 1);
                         overlayTile.GetComponent<SpriteRenderer>().sortingOrder = tileMap.GetComponent<TilemapRenderer>().sortingOrder;
                         overlayTile.gameObject.GetComponent<OverlayTile>().gridLocation = new Vector3Int(x, y, z);
 
@@ -59,6 +60,63 @@ public class MapManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public List<OverlayTile> GetNeighborTiles(OverlayTile currentOverlayTile)
+    {
+        var map = MapManager.Instance.map;
+
+        List<OverlayTile> neighbors = new List<OverlayTile>();
+
+        // Top
+        Vector2Int locationToCheck = new Vector2Int(
+            currentOverlayTile.gridLocation.x,
+            currentOverlayTile.gridLocation.y + 1
+            );
+
+        if (map.ContainsKey(locationToCheck))
+        {
+            if (Mathf.Abs(currentOverlayTile.gridLocation.z - map[locationToCheck].gridLocation.z) <= 1)
+                neighbors.Add(map[locationToCheck]);
+        }
+
+        // Bottom
+        locationToCheck = new Vector2Int(
+            currentOverlayTile.gridLocation.x,
+            currentOverlayTile.gridLocation.y - 1
+            );
+
+        if (map.ContainsKey(locationToCheck))
+        {
+            if (Mathf.Abs(currentOverlayTile.gridLocation.z - map[locationToCheck].gridLocation.z) <= 1)
+                neighbors.Add(map[locationToCheck]);
+        }
+
+        // Right
+        locationToCheck = new Vector2Int(
+            currentOverlayTile.gridLocation.x + 1,
+            currentOverlayTile.gridLocation.y
+            );
+
+        if (map.ContainsKey(locationToCheck))
+        {
+            if (Mathf.Abs(currentOverlayTile.gridLocation.z - map[locationToCheck].gridLocation.z) <= 1)
+                neighbors.Add(map[locationToCheck]);
+        }
+
+        // Left
+        locationToCheck = new Vector2Int(
+            currentOverlayTile.gridLocation.x - 1,
+            currentOverlayTile.gridLocation.y
+            );
+
+        if (map.ContainsKey(locationToCheck))
+        {
+            if (Mathf.Abs(currentOverlayTile.gridLocation.z - map[locationToCheck].gridLocation.z) <= 1)
+                neighbors.Add(map[locationToCheck]);
+        }
+
+        return neighbors;
     }
 
 }
