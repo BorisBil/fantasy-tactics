@@ -7,20 +7,26 @@ using System;
 public class MouseController : MonoBehaviour
 {
     public GameObject cursor;
+    
     public float speed;
     private CharacterInfo character;
     public GameObject characterPrefab;
+    private bool isMoving;
 
     private Pathfinder pathFinder;
     private Rangefinder rangeFinder;
-    private List<OverlayTile> path = new List<OverlayTile>();
-    private List<OverlayTile> inRangeTiles = new List<OverlayTile>();
+    private List<OverlayTile> path;
+    private List<OverlayTile> range;
 
     private void Start()
     {
         pathFinder = new Pathfinder();
-        path = new List<OverlayTile>();
         rangeFinder = new Rangefinder();
+        
+        path = new List<OverlayTile>();
+        range = new List<OverlayTile>();
+
+        isMoving = false;
     }
 
     // Update is called once per frame
@@ -33,25 +39,38 @@ public class MouseController : MonoBehaviour
             OverlayTile tile = hit.Value.collider.gameObject.GetComponent<OverlayTile>();
             
             cursor.transform.position = tile.transform.position;
-
             cursor.gameObject.GetComponent<SpriteRenderer>().sortingOrder = tile.transform.GetComponent<SpriteRenderer>().sortingOrder;
 
             if (Input.GetMouseButtonDown(0))
             {
-                tile.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
-
                 if (character == null)
                 {
                     character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
-                    PositionCharacterOnLine(tile);
                     character.standingOnTile = tile;
-                    GetInRangeTiles();
+                    PositionCharacterOnLine(tile);
                 } 
                 else
                 {
+<<<<<<< Updated upstream
                     path = pathFinder.FindPath(character.standingOnTile, tile);
 
                     tile.gameObject.GetComponent<OverlayTile>().HideTile();
+=======
+                    GetInRangeTiles();
+                    if (range.Contains(tile) && !isMoving)
+                    {
+                        path = pathFinder.FindPath(character.standingOnTile, tile, range);
+                        isMoving = true;
+                        tile.gameObject.GetComponent<OverlayTile>().HideTile();
+                        if (isMoving)
+                        {
+                            foreach (var item in range)
+                            {
+                                item.HideTile();
+                            }
+                        }
+                    }
+>>>>>>> Stashed changes
                 }
             }
         }
@@ -64,14 +83,9 @@ public class MouseController : MonoBehaviour
 
     private void GetInRangeTiles()
     {
-        inRangeTiles = rangeFinder.GetTilesInRange(character.standingOnTile, 3);
+        range = rangeFinder.GetTilesInRange(character.standingOnTile, 3);
 
-        foreach (var item in inRangeTiles)
-        {
-            item.HideTile();
-        }
-
-        foreach (var item in inRangeTiles)
+        foreach (var item in range)
         {
             item.ShowTile();
         }
@@ -94,6 +108,7 @@ public class MouseController : MonoBehaviour
         if (path.Count == 0)
         {
             GetInRangeTiles();
+            isMoving = false;
         }
     }
 

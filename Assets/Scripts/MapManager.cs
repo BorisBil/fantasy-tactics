@@ -64,8 +64,11 @@ public class MapManager : MonoBehaviour
 
     public List<OverlayTile> GetNeighborTiles(OverlayTile currentOverlayTile)
     {
+<<<<<<< Updated upstream
         var map = MapManager.Instance.map;
 
+=======
+>>>>>>> Stashed changes
         List<OverlayTile> neighbors = new List<OverlayTile>();
 
         // Top
