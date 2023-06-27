@@ -51,15 +51,10 @@ public class MouseController : MonoBehaviour
                 } 
                 else
                 {
-<<<<<<< Updated upstream
-                    path = pathFinder.FindPath(character.standingOnTile, tile);
-
-                    tile.gameObject.GetComponent<OverlayTile>().HideTile();
-=======
                     GetInRangeTiles();
                     if (range.Contains(tile) && !isMoving)
                     {
-                        path = pathFinder.FindPath(character.standingOnTile, tile, range);
+                        path = pathFinder.FindPath(character.standingOnTile, tile);
                         isMoving = true;
                         tile.gameObject.GetComponent<OverlayTile>().HideTile();
                         if (isMoving)
@@ -70,7 +65,6 @@ public class MouseController : MonoBehaviour
                             }
                         }
                     }
->>>>>>> Stashed changes
                 }
             }
         }
