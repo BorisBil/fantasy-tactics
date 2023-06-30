@@ -69,9 +69,14 @@ public class MouseController : MonoBehaviour
             }
         }
 
-        if (path.Count > 0)
+        if (path.Count > 0 && isMoving)
         {
             MoveAlongPath();
+        }
+        if (path.Count == 0 && character != null)
+        {
+            GetInRangeTiles();
+            isMoving = false;
         }
     }
 
@@ -97,12 +102,6 @@ public class MouseController : MonoBehaviour
         {
             PositionCharacterOnLine(path[0]);
             path.RemoveAt(0);
-        }
-
-        if (path.Count == 0)
-        {
-            GetInRangeTiles();
-            isMoving = false;
         }
     }
 
