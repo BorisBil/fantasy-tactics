@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44911343, g: 0.4991871, b: 0.57571524, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -170,14 +170,18 @@ MonoBehaviour:
   tileTypes:
   - name: Grass
     tileVisualPrefab: {fileID: 5497570994063074875, guid: 9a016cba11958e344844bf247fb7e278, type: 3}
-    isWalkable: 0
-    movementCost: 0
+    isWalkable: 1
+    movementCost: 1
   - name: Swamp
     tileVisualPrefab: {fileID: 4453126638398938434, guid: dc9ca605e3b86fd4b8937613ad683e6e, type: 3}
-    isWalkable: 0
-    movementCost: 0
+    isWalkable: 1
+    movementCost: 1
   - name: Mountain
     tileVisualPrefab: {fileID: 5689061405100041663, guid: ba5896dbee2dc2d40ae9185f2381a07d, type: 3}
+    isWalkable: 1
+    movementCost: 1
+  - name: Wall
+    tileVisualPrefab: {fileID: 2518862159114457414, guid: 0bb02c0a6313f9c469ca091e55ba43be, type: 3}
     isWalkable: 0
     movementCost: 0
   selectedUnit: {fileID: 559803565}
@@ -229,6 +233,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileX: 0
   tileY: 0
+  tileZ: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,14 +320,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.616112, y: -0.68377554, z: 0.17608373, w: 0.34907258}
+  m_LocalPosition: {x: 8.38, y: 11.71, z: 16.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 42.14, y: -159.441, z: -76.047}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,14 +412,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 4.5, z: -15}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 5, y: 4.5, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &2051027755
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,7 +447,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2051027755}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.75}
+  m_LocalPosition: {x: 0, y: 0, z: 0.75}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []

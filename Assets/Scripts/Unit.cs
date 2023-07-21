@@ -4,7 +4,16 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    public int tileX;
-    public int tileY;
-    public int tileZ;
+    public Vector3Int unitLocation;
+
+    public TileMap tileMap;
+
+    public List<Node> currentPath = null;
+
+    public string unitName;
+    public string unitDescription;
+    public string unitType;
+
+    public int unitSpeed;
+    public int unitRange;
 }
