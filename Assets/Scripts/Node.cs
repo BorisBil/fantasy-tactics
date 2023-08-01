@@ -4,23 +4,28 @@ using UnityEngine;
 
 public class Node
 {
+    public Vector3Int location;
+
+    public float G;
+    public float H;
+
+    public bool isWalkable;
+    public float movementCost;
+
+    public Node previous;
+
     public List<Node> neighbors;
-    public int x;
-    public int y;
-    public int z;
 
     public Node()
     {
         neighbors = new List<Node>();
     }
 
-    public float DistanceTo(Node node)
+    public float F
     {
-        if (node == null)
+        get
         {
-            Debug.LogError("WTF?");
+            return G + H;
         }
-
-        return Vector3.Distance(new Vector3(x, y, z), new Vector3(node.x, node.y, node.z));
     }
 }

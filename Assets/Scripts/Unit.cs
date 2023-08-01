@@ -14,6 +14,6 @@ public class Unit : MonoBehaviour
     public string unitDescription;
     public string unitType;
 
-    public int unitSpeed;
+    public int unitSpeed = 4;
     public int unitRange;
 }

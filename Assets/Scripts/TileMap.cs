@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class TileMap : MonoBehaviour
@@ -51,17 +48,14 @@ public class TileMap : MonoBehaviour
                 tileMapList.Add(tileLocation);
             }
         }
-        
-        tileTypeMap[4, 4, 0] = 2;
-        tileTypeMap[5, 4, 0] = 2;
-        tileTypeMap[6, 4, 0] = 2;
-        tileTypeMap[7, 4, 0] = 2;
-        tileTypeMap[8, 4, 0] = 2;
 
-        tileTypeMap[4, 5, 0] = 2;
-        tileTypeMap[4, 6, 0] = 2;
-        tileTypeMap[8, 5, 0] = 2;
-        tileTypeMap[8, 6, 0] = 2;
+        for (int x = 0; x < 3; x++)
+        {
+            for (int y = 3; y < 6; y++)
+            {
+                tileTypeMap[x, y, 0] = 1;
+            }
+        }
 
         for (int x = 3; x < 6; x++)
         {
@@ -72,11 +66,12 @@ public class TileMap : MonoBehaviour
                 tileMapList.Add(tileLocation);
             }
         }
+        
         for (int x = 6; x < 9; x++)
         {
             for (int y = 3; y < 6; y++)
             {
-                tileTypeMap[x, y, 1] = 3;
+                tileTypeMap[x, y, 1] = 2;
                 Vector3Int tileLocation = new Vector3Int(x, y, 1);
                 tileMapList.Add(tileLocation);
             }
@@ -90,10 +85,12 @@ public class TileMap : MonoBehaviour
     {
         foreach (var item in tileMapList)
         {
+            /// Instantiating the tiles after setting their type based on the map graph
             TileType type = tileTypes[tileTypeMap[item.x, item.y, item.z]];
-            GameObject cube = (GameObject)Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
+            GameObject tile = (GameObject)Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
 
-            Tile clickableTile = cube.GetComponent<Tile>();
+            /// Setting clickable tiles based on type
+            Tile clickableTile = tile.GetComponent<Tile>();
             if (tileTypeMap[item.x, item.y, item.z] < 3)
             {
                 clickableTile.isClickable = true;
@@ -111,45 +108,92 @@ public class TileMap : MonoBehaviour
         graph = new Node[mapSizeX, mapSizeY, mapSizeZ];
         graphNodeList = new List<Vector3Int>();
 
+        /// Generate a node for each tile we have on the map
         foreach (var item in tileMapList)
         {
             graph[item.x, item.y, item.z] = new Node();
-            graph[item.x, item.y, item.z].x = item.x;
-            graph[item.x, item.y, item.z].y = item.y;
-            graph[item.x, item.y, item.z].z = item.z;
+            graph[item.x, item.y, item.z].movementCost = 
+                tileTypes[tileTypeMap[item.x, item.y, item.z]].movementCost;
+
+            /// Setting unwalkable tiletypes to not be walkable on the node grid
+            if (tileTypes[tileTypeMap[item.x, item.y, item.z]].isWalkable == true)
+            {
+                graph[item.x, item.y, item.z].isWalkable = true;
+            }
+            else
+            {
+                graph[item.x, item.y, item.z].isWalkable = false;
+            }
+            
+            /// Setting "underground" nodes to be unwalkable
+            if (tileMapList.Contains(new Vector3Int(item.x, item.y, item.z + 1)))
+            {
+                graph[item.x, item.y, item.z].isWalkable = false;
+            }
+            
+            graph[item.x, item.y, item.z].location = new Vector3Int(item.x, item.y, item.z);
             graphNodeList.Add(item);
         }
 
         foreach (var index in graphNodeList)
         {
-            if (index.x > 0)
+            /// Adding all the neighbors that are on the same plane
+            if (tileMapList.Contains(new Vector3Int(index.x - 1, index.y, index.z)))
+            {
                 graph[index.x, index.y, index.z].neighbors.Add(graph[index.x - 1, index.y, index.z]);
-            if (index.x < mapSizeX - 1)
+            }
+            
+            if (tileMapList.Contains(new Vector3Int(index.x + 1, index.y, index.z)))
+            {
                 graph[index.x, index.y, index.z].neighbors.Add(graph[index.x + 1, index.y, index.z]);
-            if (index.y > 0)
+            }
+            
+            if (tileMapList.Contains(new Vector3Int(index.x, index.y - 1, index.z)))
+            {
                 graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y - 1, index.z]);
-            if (index.y < mapSizeY - 1)
+            }
+            
+            if (tileMapList.Contains(new Vector3Int(index.x, index.y + 1, index.z)))
+            {
                 graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y + 1, index.z]);
-        }
-    }
+            }
 
-    /* PATHFINDING
-     * This function is responsible for the pathfinding behind moving units
-     */
+            /// Adding "steps" between higher/lower ground to the neighbors
+            if (tileMapList.Contains(new Vector3Int(index.x - 1, index.y, index.z - 1)))
+            {
+                if (graph[index.x - 1, index.y, index.z - 1].isWalkable)
+                {
+                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x - 1, index.y, index.z - 1]);
+                    graph[index.x - 1, index.y, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                }
+            }
 
-    public void GeneratePathTo(Vector3Int tileLocation)
-    {
-        // Clear out our unit's old path.
-        selectedUnit.GetComponent<Unit>().currentPath = null;
+            if (tileMapList.Contains(new Vector3Int(index.x + 1, index.y, index.z - 1)))
+            {
+                if (graph[index.x + 1, index.y, index.z - 1].isWalkable)
+                {
+                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x + 1, index.y, index.z - 1]);
+                    graph[index.x + 1, index.y, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                }
+            }
 
-        Vector3Int unitLocation = selectedUnit.GetComponent<Unit>().unitLocation = 
-            new Vector3Int((int)selectedUnit.transform.position.x,
-            (int)selectedUnit.transform.position.y,
-            (int)selectedUnit.transform.position.z);
+            if (tileMapList.Contains(new Vector3Int(index.x, index.y - 1, index.z - 1)))
+            {
+                if (graph[index.x, index.y - 1, index.z - 1].isWalkable)
+                {
+                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y - 1, index.z - 1]);
+                    graph[index.x, index.y - 1, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                }
+            }
 
-        if (UnitCanEnterTile(tileLocation) == false)
-        {
-            return;
+            if (tileMapList.Contains(new Vector3Int(index.x, index.y + 1, index.z - 1)))
+            {
+                if (graph[index.x, index.y + 1, index.z - 1].isWalkable)
+                {
+                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y + 1, index.z - 1]);
+                    graph[index.x, index.y + 1, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                }
+            }
         }
     }
 
@@ -158,8 +202,81 @@ public class TileMap : MonoBehaviour
      */
     public void MoveSelectedUnitTo(Vector3Int gridCoords)
     {
-        selectedUnit.GetComponent<Unit>().unitLocation = gridCoords;
-        selectedUnit.transform.position = gridCoords;
+        Vector3Int unitLocation = selectedUnit.GetComponent<Unit>().unitLocation;
+        List<Node> path = GeneratePathTo(gridCoords, unitLocation);
+
+        Debug.Log("NEW PATH");
+        foreach (var node in path)
+        {
+            Debug.Log(node.location);
+        }
+    }
+
+    /* PATHFINDING
+     * This function is responsible for the pathfinding behind moving units
+     */
+    public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3Int unitLocation)
+    {
+        if (UnitCanEnterTile(targetLocation) == false)
+        {
+            return null;
+        }
+
+        Node startNode = graph[unitLocation.x, unitLocation.y, unitLocation.z];
+        Node endNode = graph[targetLocation.x, targetLocation.y, targetLocation.z];
+
+        List<Node> openList = new List<Node>();
+        HashSet<Node> closedList = new HashSet<Node>();
+
+        openList.Add(startNode);
+
+        while (openList.Count > 0) 
+        {
+            Node currentNode = openList.OrderBy(x => x.F).First();
+
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            if (currentNode == endNode)
+            {
+                return GetFinishedList(startNode, endNode);
+            }
+
+            foreach (Node neighbor in currentNode.neighbors)
+            {
+                if (!neighbor.isWalkable || closedList.Contains(neighbor))
+                {
+                    continue;
+                }
+
+                neighbor.G = GetDistance(startNode, neighbor) * neighbor.movementCost;
+                neighbor.H = GetDistance(endNode, neighbor) * neighbor.movementCost;
+                neighbor.previous = currentNode;
+
+                if (!openList.Contains(neighbor))
+                {
+                    openList.Add(neighbor);
+                }
+            }
+        }
+
+        return new List<Node>();
+    }
+
+    /// Flips the pathfinding list around for the final result
+    private List<Node> GetFinishedList(Node startNode, Node endNode)
+    {
+        List<Node> path = new List<Node>();
+        Node currentNode = endNode;
+
+        while (currentNode != startNode)
+        {
+            path.Add(currentNode);
+            currentNode = currentNode.previous;
+        }
+        path.Reverse();
+
+        return path;
     }
 
     /// Test to see if the unit can enter the tile
@@ -168,9 +285,11 @@ public class TileMap : MonoBehaviour
         return tileTypes[tileTypeMap[tileCoords.x, tileCoords.y, tileCoords.z]].isWalkable;
     }
 
-    /// Return the movement cost of a tile
-    public float CostToEnterTile(Vector3Int tileCoords)
+    /// Gets the (3D Version?) Manhattan distance between nodes
+    private int GetDistance(Node start, Node neighbor)
     {
-        return tileTypes[tileTypeMap[tileCoords.x, tileCoords.y, tileCoords.z]].movementCost;
+        return  Mathf.Abs(start.location.x - neighbor.location.x) + 
+                Mathf.Abs(start.location.y - neighbor.location.y) + 
+                Mathf.Abs(start.location.z - neighbor.location.z);
     }
 }
