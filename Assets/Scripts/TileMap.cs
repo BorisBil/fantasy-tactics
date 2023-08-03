@@ -5,7 +5,9 @@ using UnityEngine;
 public class TileMap : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
-    public TileType[] tileTypes;
+    public TileSets.GrassyHills[] grassyHills;
+    public TileSets.DesertHills[] desertHills;
+
     public GameObject selectedUnit;
 
     Node[,,] graph;
@@ -20,10 +22,8 @@ public class TileMap : MonoBehaviour
     /// 
     /// Void Start Unity method that launches on startup
     /// 
-    private void Start()
+    public void GenerateTileMap()
     {
-        selectedUnit.GetComponent<Unit>().tileMap = this;
-
         GenerateMapData();
         GenerateMapVisual();
         GenerateMapGraph();
@@ -86,7 +86,7 @@ public class TileMap : MonoBehaviour
         foreach (var item in tileMapList)
         {
             /// Instantiating the tiles after setting their type based on the map graph
-            TileType type = tileTypes[tileTypeMap[item.x, item.y, item.z]];
+            TileSets.GrassyHills type = grassyHills[tileTypeMap[item.x, item.y, item.z]];
             GameObject tile = (GameObject)Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
 
             /// Setting clickable tiles based on type
@@ -113,10 +113,10 @@ public class TileMap : MonoBehaviour
         {
             graph[item.x, item.y, item.z] = new Node();
             graph[item.x, item.y, item.z].movementCost = 
-                tileTypes[tileTypeMap[item.x, item.y, item.z]].movementCost;
+                grassyHills[tileTypeMap[item.x, item.y, item.z]].movementCost;
 
             /// Setting unwalkable tiletypes to not be walkable on the node grid
-            if (tileTypes[tileTypeMap[item.x, item.y, item.z]].isWalkable == true)
+            if (grassyHills[tileTypeMap[item.x, item.y, item.z]].isWalkable == true)
             {
                 graph[item.x, item.y, item.z].isWalkable = true;
             }
@@ -282,7 +282,7 @@ public class TileMap : MonoBehaviour
     /// Test to see if the unit can enter the tile
     public bool UnitCanEnterTile(Vector3Int tileCoords)
     {
-        return tileTypes[tileTypeMap[tileCoords.x, tileCoords.y, tileCoords.z]].isWalkable;
+        return grassyHills[tileTypeMap[tileCoords.x, tileCoords.y, tileCoords.z]].isWalkable;
     }
 
     /// Gets the (3D Version?) Manhattan distance between nodes
