@@ -8,12 +8,10 @@ public class TileMap : MonoBehaviour
     public TileSets.GrassyHills[] grassyHills;
     public TileSets.DesertHills[] desertHills;
 
-    public GameObject selectedUnit;
+    private Node[,,] graph;
 
-    Node[,,] graph;
-
-    int[,,] tileTypeMap;
-    int mapSizeX, mapSizeY, mapSizeZ;
+    private int[,,] tileTypeMap;
+    private int mapSizeX, mapSizeY, mapSizeZ;
 
     public List<Vector3Int> tileMapList;
     public List<Vector3Int> graphNodeList;
@@ -200,9 +198,8 @@ public class TileMap : MonoBehaviour
     /* MOVING THE UNIT
      * This function is responsible for moving units (NOT PATHFINDING)
      */
-    public void MoveSelectedUnitTo(Vector3Int gridCoords)
+    public void MoveSelectedUnitTo(Vector3Int gridCoords, Vector3Int unitLocation)
     {
-        Vector3Int unitLocation = selectedUnit.GetComponent<Unit>().unitLocation;
         List<Node> path = GeneratePathTo(gridCoords, unitLocation);
 
         Debug.Log("NEW PATH");

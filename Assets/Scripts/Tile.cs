@@ -8,12 +8,4 @@ public class Tile : MonoBehaviour
     public bool isClickable = false;
     
     public TileMap map;
-
-    private void OnMouseUp()
-    {
-        if (isClickable)
-        {
-            map.MoveSelectedUnitTo(tileLocation);
-        }
-    }
 }
