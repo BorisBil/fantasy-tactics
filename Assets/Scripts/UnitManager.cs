@@ -9,6 +9,8 @@ public class UnitManager : MonoBehaviour
 
     public EnemyUnitType[] enemyUnitType;
 
+    public GameObject _unitManager;
+
     public void NewPlayerUnit()
     {
         PlayerUnits unit = new PlayerUnits();
@@ -28,12 +30,14 @@ public class UnitManager : MonoBehaviour
     {
         PlayerUnits unit = playerUnits[squadIndex];
         GameObject spawnedUnit = (GameObject)Instantiate(unit.unitModel, spawnAt, Quaternion.identity);
+        spawnedUnit.transform.parent = _unitManager.transform;
         unit.unitLocation = spawnAt;
     }
     
     public void SpawnEnemyUnit(EnemyUnitType unit, Vector3Int spawnAt)
     {
         GameObject enemyUnit = (GameObject)Instantiate(unit.unitModel, spawnAt, Quaternion.identity);
+        enemyUnit.transform.parent = _unitManager.transform;
         AddEnemyUnitToList(unit, spawnAt);
     }
 

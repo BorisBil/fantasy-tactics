@@ -15,6 +15,8 @@ public class TileMap : MonoBehaviour
 
     public List<Vector3Int> tileMapList;
     public List<Vector3Int> graphNodeList;
+
+    public GameObject map;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     /// 
@@ -86,6 +88,7 @@ public class TileMap : MonoBehaviour
             /// Instantiating the tiles after setting their type based on the map graph
             TileSets.GrassyHills type = grassyHills[tileTypeMap[item.x, item.y, item.z]];
             GameObject tile = (GameObject)Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
+            tile.transform.parent = map.transform;
 
             /// Setting clickable tiles based on type
             Tile clickableTile = tile.GetComponent<Tile>();
