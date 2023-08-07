@@ -1,18 +1,19 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
     public List<PlayerUnits> playerUnits;
-    public EnemyUnits[] enemyUnits;
+    public List<EnemyUnits> enemyUnits;
+
+    public EnemyUnitType[] enemyUnitType;
 
     public void NewPlayerUnit()
     {
         PlayerUnits unit = new PlayerUnits();
 
         unit.name = "Player 1";
-
-        unit.unitLocation = new Vector3Int(0, 0, 0);
 
         unit.unitModel = Resources.Load("Prefabs/playerUnit") as GameObject;
         unit.unitDescription = "Test";
@@ -23,27 +24,48 @@ public class UnitManager : MonoBehaviour
         playerUnits.Add(unit);
     }
 
-    public void SpawnPlayerUnit(int squadIndex)
+    public void SpawnPlayerUnit(int squadIndex, Vector3Int spawnAt)
     {
         PlayerUnits unit = playerUnits[squadIndex];
-        GameObject spawnedUnit = (GameObject)Instantiate(unit.unitModel, unit.unitLocation, Quaternion.identity);
+        GameObject spawnedUnit = (GameObject)Instantiate(unit.unitModel, spawnAt, Quaternion.identity);
+        unit.unitLocation = spawnAt;
     }
     
-    public void SpawnEnemyUnit(EnemyUnits unit, Vector3Int spawnAt)
+    public void SpawnEnemyUnit(EnemyUnitType unit, Vector3Int spawnAt)
     {
-        unit.unitLocation = spawnAt;
         GameObject enemyUnit = (GameObject)Instantiate(unit.unitModel, spawnAt, Quaternion.identity);
+        AddEnemyUnitToList(unit, spawnAt);
+    }
+
+    public void AddEnemyUnitToList(EnemyUnitType unit, Vector3Int location)
+    {
+        EnemyUnits enemy = new EnemyUnits();
+        enemy.name = unit.name;
+        enemy.unitModel = unit.unitModel;
+        enemy.unitDescription = unit.unitDescription;
+        enemy.unitType = unit.unitType;
+        enemy.unitSpeed = unit.unitSpeed;
+        enemy.unitRange = unit.unitRange;
+        enemy.unitTeam = unit.unitTeam;
+        enemy.unitLocation = location;
+        enemyUnits.Add(enemy);
     }
 
     [System.Serializable]
     public class PlayerUnits : Unit
     {
-        
+        public Vector3Int unitLocation;
     }
 
     [System.Serializable]
-    public class EnemyUnits : Unit
+    public class EnemyUnitType : Unit
     {
 
+    }
+
+    [System.Serializable]
+    public class EnemyUnits : EnemyUnitType
+    {
+        public Vector3Int unitLocation;
     }
 }

@@ -450,9 +450,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerUnits: []
-  enemyUnits:
+  enemyUnits: []
+  enemyUnitType:
   - name: Goblin
-    unitLocation: {x: 0, y: 0, z: 0}
     unitModel: {fileID: 7524149732388544378, guid: 669e31bdb2c2023478778382a0ce2fe0, type: 3}
     unitDescription: It's a goblin
     unitType: Fighter
@@ -506,25 +506,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileMap: {fileID: 161391764}
   unitManager: {fileID: 1586870097}
-  playerUnits:
-    name: 
-    unitLocation: {x: 0, y: 0, z: 0}
-    unitModel: {fileID: 0}
-    unitDescription: 
-    unitType: 
-    unitSpeed: 0
-    unitRange: 0
-    unitTeam: 0
-  enemyUnits:
-    name: 
-    unitLocation: {x: 0, y: 0, z: 0}
-    unitModel: {fileID: 0}
-    unitDescription: 
-    unitType: 
-    unitSpeed: 0
-    unitRange: 0
-    unitTeam: 0
-  selectedUnit: {fileID: 0}
 --- !u!1 &2075930464
 GameObject:
   m_ObjectHideFlags: 0

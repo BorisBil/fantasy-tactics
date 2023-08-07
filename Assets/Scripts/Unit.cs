@@ -6,8 +6,6 @@ public class Unit
 {
     public string name;
 
-    public Vector3Int unitLocation;
-
     public GameObject unitModel;
 
     public List<Node> currentPath = null;
