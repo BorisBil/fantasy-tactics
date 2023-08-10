@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Unit
+public class Unit : MonoBehaviour
 {
-    public string name;
+    public new string name;
 
     public GameObject unitModel;
 
@@ -17,4 +18,6 @@ public class Unit
     public int unitRange;
 
     public int unitTeam;
+
+    public Vector3Int unitPosition;
 }
