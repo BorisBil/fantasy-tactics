@@ -19,9 +19,6 @@ public class TileMap : MonoBehaviour
     public GameObject map;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
-    /// 
-    /// Void Start Unity method that launches on startup
-    /// 
     public void GenerateTileMap()
     {
         GenerateMapData();

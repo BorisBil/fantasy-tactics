@@ -6,12 +6,14 @@ using UnityEngine;
 
 public class MouseController : MonoBehaviour
 {
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public TileMap tileMap;
 
     public UnitManager unitManager;
 
     public GameObject mouseOver;
     public GameObject selectedUnit;
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     void Update()
     {

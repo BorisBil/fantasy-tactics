@@ -1,20 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class GameManager : MonoBehaviour
 {
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public TileMap tileMap;
     public UnitManager unitManager;
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
-    // Start is called before the first frame update
+    /// 
+    /// Void Start Unity method that launches on startup
+    /// 
     void Start()
     {
         tileMap.GenerateTileMap();
 
-        unitManager.NewPlayerUnit();
-        unitManager.SpawnPlayerUnit(0, new Vector3Int(0, 0, 0));
+        unitManager.NewPlayerUnit(new Vector3Int(0, 0, 0));
         unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[0], new Vector3Int(9, 9, 0));
     }
 }

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
 public class Unit : MonoBehaviour
 {
     public new string name;
 
     public GameObject unitModel;
+    public GameObject unitObject;
 
     public List<Node> currentPath = null;
     

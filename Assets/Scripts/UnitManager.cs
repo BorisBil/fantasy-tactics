@@ -1,105 +1,64 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
-using static UnityEditor.FilePathAttribute;
 
 public class UnitManager : MonoBehaviour
 {
-    public List<PlayerUnits> playerUnits;
-    public List<EnemyUnits> enemyUnits;
-
-    public EnemyUnitType[] enemyUnitType;
-
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public GameObject _unitManager;
 
-    public void NewPlayerUnit()
+    public List<Unit> playerUnits;
+    public List<Unit> enemyUnits;
+
+    public EnemyUnitType[] enemyUnitType;
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
+
+    public void NewPlayerUnit(Vector3Int spawnAt)
     {
-        PlayerUnits unit = new PlayerUnits();
+        GameObject unitModel = Resources.Load("Prefabs/playerUnit") as GameObject;
+        GameObject spawnedUnit = Instantiate(unitModel, spawnAt, Quaternion.identity);
+        
+        Unit unit = spawnedUnit.GetComponent<Unit>();
 
-        unit.name = "Player 1";
+        unit.name = "Player";
+        unit.unitDescription = "Player unit";
+        unit.unitType = "Fighter";
 
-        unit.unitModel = Resources.Load("Prefabs/playerUnit") as GameObject;
-        unit.unitDescription = "Test";
-        unit.unitType = "Swordsman";
+        unit.unitSpeed = 5;
+        unit.unitRange = 1;
 
-        unit.unitTeam = 1;
+        unit.unitModel = unitModel;
+        unit.unitObject = spawnedUnit;
+
+        unit.unitPosition = spawnAt;
+
+        unit.transform.parent = _unitManager.transform;
 
         playerUnits.Add(unit);
     }
-     
-    public void SpawnPlayerUnit(int squadIndex, Vector3Int spawnAt)
-    {
-        PlayerUnits unit = playerUnits[squadIndex];
-        unit.unitPosition = spawnAt;
-        GameObject spawnedUnit = (GameObject)Instantiate(unit.unitModel, spawnAt, Quaternion.identity);
-        unit.unit = spawnedUnit;
-
-        Unit unitInfo = spawnedUnit.GetComponent<Unit>();
-
-        unitInfo.name = unit.name;
-        unitInfo.unitModel = unit.unitModel;
-        unitInfo.unitDescription = unit.unitDescription;
-        unitInfo.unitType = unit.unitType;
-        unitInfo.unitSpeed = unit.unitSpeed;
-        unitInfo.unitRange = unit.unitRange;
-        unitInfo.unitTeam = unit.unitTeam;
-        unitInfo.unitPosition = spawnAt;
-
-        spawnedUnit.transform.parent = _unitManager.transform;
-    }
     
-    public void SpawnEnemyUnit(EnemyUnitType unit, Vector3Int spawnAt)
+    public void SpawnEnemyUnit(EnemyUnitType unitType, Vector3Int spawnAt)
     {
-        EnemyUnits enemy = new EnemyUnits();
+        GameObject unitModel = unitType.unitModel;
+        GameObject spawnedEnemy = (GameObject)Instantiate(unitModel, spawnAt, Quaternion.identity);
 
-        enemy.name = unit.name;
-        enemy.unitModel = unit.unitModel;
-        enemy.unitDescription = unit.unitDescription;
-        enemy.unitType = unit.unitType;
-        enemy.unitSpeed = unit.unitSpeed;
-        enemy.unitRange = unit.unitRange;
-        enemy.unitTeam = unit.unitTeam;
-        enemy.unitPosition = spawnAt;
+        Unit unit = spawnedEnemy.GetComponent<Unit>();
 
-        GameObject spawnedEnemy = (GameObject)Instantiate(enemy.unitModel, spawnAt, Quaternion.identity);
-        enemy.unit = spawnedEnemy;
-        Unit unitInfo = spawnedEnemy.GetComponent<Unit>();
+        unit.name = unitType.name;
+        unit.unitDescription = unitType.unitDescription;
+        unit.unitType = unitType.unitType;
 
-        unitInfo.name = unit.name;
-        unitInfo.unitModel = unit.unitModel;
-        unitInfo.unitDescription = unit.unitDescription;
-        unitInfo.unitType = unit.unitType;
-        unitInfo.unitSpeed = unit.unitSpeed;
-        unitInfo.unitRange = unit.unitRange;
-        unitInfo.unitTeam = unit.unitTeam;
-        unitInfo.unitPosition = spawnAt;
+        unit.unitSpeed = unitType.unitSpeed;
+        unit.unitRange = unitType.unitRange;
 
-        spawnedEnemy.transform.parent = _unitManager.transform;
+        unit.unitModel = unitModel;
+        unit.unitObject = spawnedEnemy;
 
-        enemyUnits.Add(enemy);
-    }
+        unit.unitPosition = spawnAt;
 
-    [System.Serializable]
-    public class PlayerUnits
-    {
-        public string name;
+        unit.transform.parent = _unitManager.transform;
 
-        public GameObject unitModel;
-
-        public List<Node> currentPath = null;
-
-        public string unitDescription;
-        public string unitType;
-
-        public int unitSpeed;
-        public int unitRange;
-
-        public int unitTeam;
-
-        public Vector3Int unitPosition;
-
-        public GameObject unit;
+        enemyUnits.Add(unit);
     }
 
     [System.Serializable]
@@ -118,12 +77,5 @@ public class UnitManager : MonoBehaviour
         public int unitRange;
 
         public int unitTeam;
-    }
-
-    [System.Serializable]
-    public class EnemyUnits : EnemyUnitType
-    {
-        public Vector3Int unitPosition;
-        public GameObject unit;
     }
 }
