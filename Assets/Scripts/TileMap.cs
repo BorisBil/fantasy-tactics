@@ -1,7 +1,13 @@
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
+/// 
+/// MAP GENERATOR ALONG WITH PATHFINDING
+/// 
 public class TileMap : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
@@ -84,7 +90,7 @@ public class TileMap : MonoBehaviour
         {
             /// Instantiating the tiles after setting their type based on the map graph
             TileSets.GrassyHills type = grassyHills[tileTypeMap[item.x, item.y, item.z]];
-            GameObject tile = (GameObject)Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
+            GameObject tile = Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
             tile.transform.parent = map.transform;
 
             /// Setting clickable tiles based on type
@@ -198,12 +204,13 @@ public class TileMap : MonoBehaviour
     /* MOVING THE UNIT
      * This function is responsible for moving units (NOT PATHFINDING)
      */
-    public void MoveSelectedUnitTo(Vector3Int gridCoords, Vector3Int unitLocation)
+    public void MoveSelectedUnitTo(Vector3Int gridCoords, Unit unit)
     {
-        List<Node> path = GeneratePathTo(gridCoords, unitLocation);
+        List<Node> path = GeneratePathTo(gridCoords, unit.unitPosition);
 
-        Debug.Log("NEW PATH");
-        foreach (var node in path)
+        unit.currentPath = path;
+
+        foreach (Node node in path)
         {
             Debug.Log(node.location);
         }

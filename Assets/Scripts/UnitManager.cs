@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// 
+/// THIS FILE HOLDS ALL THE FUNCTIONS TO SPAWN AND DESPAWN UNITS
+/// 
 public class UnitManager : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
@@ -13,6 +16,9 @@ public class UnitManager : MonoBehaviour
     public EnemyUnitType[] enemyUnitType;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
+    /*
+     * Spawning in a new player unit
+     */
     public void NewPlayerUnit(Vector3Int spawnAt)
     {
         GameObject unitModel = Resources.Load("Prefabs/playerUnit") as GameObject;
@@ -36,7 +42,10 @@ public class UnitManager : MonoBehaviour
 
         playerUnits.Add(unit);
     }
-    
+
+    /*
+     * Spawning in a new enemy unit based on type specified
+     */
     public void SpawnEnemyUnit(EnemyUnitType unitType, Vector3Int spawnAt)
     {
         GameObject unitModel = unitType.unitModel;
@@ -61,6 +70,7 @@ public class UnitManager : MonoBehaviour
         enemyUnits.Add(unit);
     }
 
+    ///  Enemy unit type table
     [System.Serializable]
     public class EnemyUnitType
     {

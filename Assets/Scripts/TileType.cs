@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// 
+/// TILETYPE INFORMATION SPECIFIER
+/// 
 public class TileType
 {
     public string name;

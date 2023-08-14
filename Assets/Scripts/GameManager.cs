@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// 
+/// MAIN GAME LOOP FILE
+/// 
+
 public class GameManager : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS

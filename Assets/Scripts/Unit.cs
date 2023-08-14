@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// 
+/// THIS HOLDS ALL OF THE INFORMATION ON THE UNIT GAMEOBJECT
+/// 
 [System.Serializable]
 public class Unit : MonoBehaviour
 {

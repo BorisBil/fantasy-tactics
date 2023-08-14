@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// 
+/// PATHFINDING GRID NODE INFORMATION
+/// 
 public class Node
 {
     public Vector3Int location;

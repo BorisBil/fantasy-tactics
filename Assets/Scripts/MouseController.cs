@@ -4,6 +4,9 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// 
+/// MOUSE INPUT CONTROLS
+/// 
 public class MouseController : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
@@ -52,7 +55,7 @@ public class MouseController : MonoBehaviour
                     Debug.Log(tile.tileLocation);
                     Unit unit = selectedUnit.GetComponent<Unit>();
                     Debug.Log(unit.unitPosition);
-                    tileMap.MoveSelectedUnitTo(tile.tileLocation, unit.unitPosition);
+                    tileMap.MoveSelectedUnitTo(tile.tileLocation, unit);
                 }
             }
         }
