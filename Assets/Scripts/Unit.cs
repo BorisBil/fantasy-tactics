@@ -19,10 +19,10 @@ public class Unit : MonoBehaviour
     public string unitDescription;
     public string unitType;
 
-    public int unitSpeed;
+    public float unitSpeed;
     public int unitRange;
 
     public int unitTeam;
 
-    public Vector3Int unitPosition;
+    public Vector3 unitPosition;
 }

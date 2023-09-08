@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 /// 
@@ -16,6 +17,11 @@ public class MouseController : MonoBehaviour
 
     public GameObject mouseOver;
     public GameObject selectedUnit;
+
+    private Unit unit;
+    private Tile tile;
+
+    bool isMoving = false;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     void Update()
@@ -51,11 +57,33 @@ public class MouseController : MonoBehaviour
             {
                 if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
                 {
-                    Tile tile = mouseOver.GetComponent<Tile>();
-                    Debug.Log(tile.tileLocation);
-                    Unit unit = selectedUnit.GetComponent<Unit>();
-                    Debug.Log(unit.unitPosition);
-                    tileMap.MoveSelectedUnitTo(tile.tileLocation, unit);
+                    tile = mouseOver.GetComponent<Tile>();
+                    unit = selectedUnit.GetComponent<Unit>();
+
+                    tileMap.UpdatePath(tile.tileLocation, unit);
+                    
+                    isMoving = true;
+                }
+            }
+        }
+
+        if (isMoving)
+        {
+            if (unit.unitPosition == tile.tileLocation)
+            {
+                unit.currentPath = null;
+            }
+
+            if (unit.currentPath != null)
+            {
+                var step = unit.unitSpeed * Time.deltaTime;
+                unit.transform.position = Vector3.MoveTowards(unit.transform.position, unit.currentPath[0].location, step);
+                
+                if (unit.transform.position == unit.currentPath[0].location)
+                {
+                    unit.unitPosition = unit.currentPath[0].location;
+                    unit.transform.position = unit.unitPosition;
+                    unit.currentPath.RemoveAt(0);
                 }
             }
         }

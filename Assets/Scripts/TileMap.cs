@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
@@ -204,29 +205,24 @@ public class TileMap : MonoBehaviour
     /* MOVING THE UNIT
      * This function is responsible for moving units (NOT PATHFINDING)
      */
-    public void MoveSelectedUnitTo(Vector3Int gridCoords, Unit unit)
+    public void UpdatePath(Vector3Int gridCoords, Unit unit)
     {
         List<Node> path = GeneratePathTo(gridCoords, unit.unitPosition);
 
         unit.currentPath = path;
-
-        foreach (Node node in path)
-        {
-            Debug.Log(node.location);
-        }
     }
 
     /* PATHFINDING
      * This function is responsible for the pathfinding behind moving units
      */
-    public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3Int unitLocation)
+    public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3 unitLocation)
     {
         if (UnitCanEnterTile(targetLocation) == false)
         {
             return null;
         }
 
-        Node startNode = graph[unitLocation.x, unitLocation.y, unitLocation.z];
+        Node startNode = graph[(int)unitLocation.x, (int)unitLocation.y, (int)unitLocation.z];
         Node endNode = graph[targetLocation.x, targetLocation.y, targetLocation.z];
 
         List<Node> openList = new List<Node>();
@@ -236,7 +232,9 @@ public class TileMap : MonoBehaviour
 
         while (openList.Count > 0) 
         {
-            Node currentNode = openList.OrderBy(x => x.F).First();
+            Node currentNode = openList.OrderBy(node => node.F).First();
+
+            Debug.Log(currentNode.location);
 
             openList.Remove(currentNode);
             closedList.Add(currentNode);
@@ -253,8 +251,10 @@ public class TileMap : MonoBehaviour
                     continue;
                 }
 
-                neighbor.G = GetDistance(startNode, neighbor) * neighbor.movementCost;
-                neighbor.H = GetDistance(endNode, neighbor) * neighbor.movementCost;
+                neighbor.G = (GetDistance(startNode, neighbor));
+                neighbor.H = (GetDistance(endNode, neighbor)) * (neighbor.movementCost);
+                Debug.Log(neighbor.location);
+                Debug.Log(neighbor.F);
                 neighbor.previous = currentNode;
 
                 if (!openList.Contains(neighbor))
