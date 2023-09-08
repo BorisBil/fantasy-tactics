@@ -20,7 +20,8 @@ public class Unit : MonoBehaviour
     public string unitType;
 
     public float unitSpeed;
-    public int unitRange;
+    public int movementRange;
+    public int attackRange;
 
     public int unitTeam;
 

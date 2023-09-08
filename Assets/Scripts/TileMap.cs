@@ -202,6 +202,47 @@ public class TileMap : MonoBehaviour
         }
     }
 
+    public List<Node> TileRange(Unit character)
+    {
+        /*
+            BFS until depth character movement range, return all nodes traversed
+        */
+        Vector3 unitLocation = character.unitPosition;
+        Node startNode = graph[(int)unitLocation.x, (int)unitLocation.y, (int)unitLocation.z];
+        Dictionary<Node, float> movement_available = new Dictionary<Node, float>();
+        movement_available[startNode] = character.movementRange;
+
+        List<Node> openList = new List<Node>();
+        openList.Add(startNode);
+
+        List<Node> range = new List<Node>();
+
+        while (openList.Count > 0) 
+        {
+            Node currentNode = openList.First();
+            Debug.Log(currentNode.location);
+            openList.Remove(currentNode);
+
+            foreach (Node neighbor in currentNode.neighbors)
+            {
+                float new_movement_available = movement_available[currentNode] - neighbor.movementCost;
+                if ((neighbor.isWalkable) && (!movement_available.ContainsKey(neighbor) || new_movement_available > movement_available[neighbor]) && new_movement_available >= 0)
+                {
+                    movement_available[neighbor] = new_movement_available;
+                    Debug.Log(new_movement_available);
+                    //neighbor.F = new_movement_available;
+                    //neighbor.previous = currentNode;
+                    if (!openList.Contains(neighbor))
+                    {
+                        openList.Add(neighbor);
+                    }
+                    range.Add(neighbor);
+                }
+            }
+        }
+        return range;
+    }
+
     /* MOVING THE UNIT
      * This function is responsible for moving units (NOT PATHFINDING)
      */
@@ -217,7 +258,6 @@ public class TileMap : MonoBehaviour
      */
     public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3 unitLocation)
     {
-        Debug.Log("HERE");
         if (UnitCanEnterTile(targetLocation) == false)
         {
             return null;
@@ -245,11 +285,9 @@ public class TileMap : MonoBehaviour
 
             foreach (Node neighbor in currentNode.neighbors)
             {
-                Debug.Log("hi");
                 float new_cost = cost_so_far[currentNode] + neighbor.movementCost;
                 if ((neighbor.isWalkable) && (!cost_so_far.ContainsKey(neighbor) || new_cost < cost_so_far[neighbor]))
                 {
-                    Debug.Log("HI");
                     cost_so_far[neighbor] = new_cost;
                     Debug.Log(new_cost);
                     neighbor.F = new_cost + GetDistance(endNode, neighbor);

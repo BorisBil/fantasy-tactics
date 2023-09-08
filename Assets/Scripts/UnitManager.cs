@@ -31,7 +31,7 @@ public class UnitManager : MonoBehaviour
         unit.unitType = "Fighter";
 
         unit.unitSpeed = 5;
-        unit.unitRange = 1;
+        unit.movementRange = 7;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedUnit;
@@ -58,7 +58,8 @@ public class UnitManager : MonoBehaviour
         unit.unitType = unitType.unitType;
 
         unit.unitSpeed = unitType.unitSpeed;
-        unit.unitRange = unitType.unitRange;
+        unit.movementRange = unitType.movementRange;
+        unit.attackRange = unitType.attackRange;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedEnemy;
@@ -84,8 +85,8 @@ public class UnitManager : MonoBehaviour
         public string unitType;
 
         public int unitSpeed;
-        public int unitRange;
-
+        public int movementRange;
+        public int attackRange;
         public int unitTeam;
     }
 }

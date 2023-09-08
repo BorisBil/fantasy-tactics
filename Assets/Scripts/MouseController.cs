@@ -20,7 +20,7 @@ public class MouseController : MonoBehaviour
 
     private Unit unit;
     private Tile tile;
-
+    private List<Node> inRange;
     bool isMoving = false;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
@@ -41,10 +41,10 @@ public class MouseController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("WAT");
             if (mouseOver == GameObject.Find("playerUnit(Clone)"))
             {
                 selectedUnit = mouseOver;
+                inRange = tileMap.TileRange(selectedUnit.GetComponent<Unit>());
             }
             else
             {
@@ -56,15 +56,24 @@ public class MouseController : MonoBehaviour
         {
             if (selectedUnit)
             {
-                Debug.Log("Selected?");
                 if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
                 {
+
                     tile = mouseOver.GetComponent<Tile>();
                     unit = selectedUnit.GetComponent<Unit>();
-
-                    tileMap.UpdatePath(tile.tileLocation, unit);
-                    
-                    isMoving = true;
+                    bool contains = false;
+                    for (int i = 0; i < inRange.Count; i++)
+                    {
+                        if (inRange[i].location == tile.tileLocation)
+                            contains = true;
+                    }
+                    if (contains)
+                    {
+                        tileMap.UpdatePath(tile.tileLocation, unit); 
+                        isMoving = true;
+                        inRange = null;
+                        selectedUnit = null;
+                    }
                 }
             }
         }
