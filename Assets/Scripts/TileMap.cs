@@ -217,6 +217,7 @@ public class TileMap : MonoBehaviour
      */
     public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3 unitLocation)
     {
+        Debug.Log("HERE");
         if (UnitCanEnterTile(targetLocation) == false)
         {
             return null;
@@ -226,10 +227,9 @@ public class TileMap : MonoBehaviour
         Node endNode = graph[targetLocation.x, targetLocation.y, targetLocation.z];
 
         List<Node> openList = new List<Node>();
-        HashSet<Node> closedList = new HashSet<Node>();
-
+        Dictionary<Node, float> cost_so_far = new Dictionary<Node, float>();
         openList.Add(startNode);
-
+        cost_so_far[startNode] = 0;
         while (openList.Count > 0) 
         {
             Node currentNode = openList.OrderBy(node => node.F).First();
@@ -237,7 +237,6 @@ public class TileMap : MonoBehaviour
             Debug.Log(currentNode.location);
 
             openList.Remove(currentNode);
-            closedList.Add(currentNode);
 
             if (currentNode == endNode)
             {
@@ -246,20 +245,19 @@ public class TileMap : MonoBehaviour
 
             foreach (Node neighbor in currentNode.neighbors)
             {
-                if (!neighbor.isWalkable || closedList.Contains(neighbor))
+                Debug.Log("hi");
+                float new_cost = cost_so_far[currentNode] + neighbor.movementCost;
+                if ((neighbor.isWalkable) && (!cost_so_far.ContainsKey(neighbor) || new_cost < cost_so_far[neighbor]))
                 {
-                    continue;
-                }
-
-                neighbor.G = (GetDistance(startNode, neighbor));
-                neighbor.H = (GetDistance(endNode, neighbor)) * (neighbor.movementCost);
-                Debug.Log(neighbor.location);
-                Debug.Log(neighbor.F);
-                neighbor.previous = currentNode;
-
-                if (!openList.Contains(neighbor))
-                {
-                    openList.Add(neighbor);
+                    Debug.Log("HI");
+                    cost_so_far[neighbor] = new_cost;
+                    Debug.Log(new_cost);
+                    neighbor.F = new_cost + GetDistance(endNode, neighbor);
+                    neighbor.previous = currentNode;
+                    if (!openList.Contains(neighbor))
+                    {
+                        openList.Add(neighbor);
+                    }
                 }
             }
         }

@@ -41,6 +41,7 @@ public class MouseController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            Debug.Log("WAT");
             if (mouseOver == GameObject.Find("playerUnit(Clone)"))
             {
                 selectedUnit = mouseOver;
@@ -55,6 +56,7 @@ public class MouseController : MonoBehaviour
         {
             if (selectedUnit)
             {
+                Debug.Log("Selected?");
                 if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
                 {
                     tile = mouseOver.GetComponent<Tile>();

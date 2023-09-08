@@ -11,7 +11,7 @@ public class Node
 
     public float G;
     public float H;
-    public float F { get { return G + H; } }
+    public float F; //{ get { return G + H; } }
 
     public bool isWalkable;
     public float movementCost;
