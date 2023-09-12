@@ -133,6 +133,8 @@ GameObject:
   m_Component:
   - component: {fileID: 161391763}
   - component: {fileID: 161391764}
+  - component: {fileID: 161391765}
+  - component: {fileID: 161391766}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -167,6 +169,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3161a617f8f26364797c5b0985ddce98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grassyHills: {fileID: 161391765}
+  desertHills: {fileID: 161391766}
+--- !u!114 &161391765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161391762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6cd1b9d473f72540b3189e9c583a292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   grassyHills:
   - name: Grass
     tileVisualPrefab: {fileID: 5497570994063074875, guid: 9a016cba11958e344844bf247fb7e278, type: 3}
@@ -184,10 +200,37 @@ MonoBehaviour:
     tileVisualPrefab: {fileID: 2518862159114457414, guid: 0bb02c0a6313f9c469ca091e55ba43be, type: 3}
     isWalkable: 0
     movementCost: 1000
-  desertHills: []
-  tileMapList: []
-  graphNodeList: []
   map: {fileID: 161391762}
+--- !u!114 &161391766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161391762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 821262e64ea691d4c975fae5d8c54a46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  desertHills:
+  - name: Desert
+    tileVisualPrefab: {fileID: 5497570994063074875, guid: dc8922797f3e522409f0f5b7e0f5a732, type: 3}
+    isWalkable: 0
+    movementCost: 0
+  - name: Oasis
+    tileVisualPrefab: {fileID: 5497570994063074875, guid: f0c2903ffe4956949ad1de93ddcf7f2e, type: 3}
+    isWalkable: 1
+    movementCost: 3
+  - name: Mountain
+    tileVisualPrefab: {fileID: 5497570994063074875, guid: 10344ea0f41c2a64d84d206e0ace0e93, type: 3}
+    isWalkable: 1
+    movementCost: 5
+  - name: Wall
+    tileVisualPrefab: {fileID: 5497570994063074875, guid: c67c05e5bb269ef4e8d6c1fc95a3cdd1, type: 3}
+    isWalkable: 0
+    movementCost: 1000
+  map: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,7 +502,8 @@ MonoBehaviour:
     unitDescription: It's a goblin
     unitType: Fighter
     unitSpeed: 5
-    unitRange: 1
+    movementRange: 0
+    attackRange: 0
     unitTeam: 2
 --- !u!1 &1883348081
 GameObject:

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// 
@@ -18,7 +16,7 @@ public class GameManager : MonoBehaviour
     /// 
     void Start()
     {
-        tileMap.GenerateTileMap();
+        tileMap.GenerateGrassyHills(10, 10, 5);
 
         unitManager.NewPlayerUnit(new Vector3Int(0, 0, 0));
         unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[0], new Vector3Int(9, 9, 0));

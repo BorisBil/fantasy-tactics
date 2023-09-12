@@ -1,8 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 /// 
@@ -20,6 +16,7 @@ public class MouseController : MonoBehaviour
 
     private Unit unit;
     private Tile tile;
+
     private List<Node> inRange;
     bool isMoving = false;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
@@ -58,7 +55,6 @@ public class MouseController : MonoBehaviour
             {
                 if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
                 {
-
                     tile = mouseOver.GetComponent<Tile>();
                     unit = selectedUnit.GetComponent<Unit>();
                     bool contains = false;
@@ -89,7 +85,7 @@ public class MouseController : MonoBehaviour
             {
                 var step = unit.unitSpeed * Time.deltaTime;
                 unit.transform.position = Vector3.MoveTowards(unit.transform.position, unit.currentPath[0].location, step);
-                
+
                 if (unit.transform.position == unit.currentPath[0].location)
                 {
                     unit.unitPosition = unit.currentPath[0].location;

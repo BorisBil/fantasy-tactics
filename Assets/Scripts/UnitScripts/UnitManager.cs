@@ -21,7 +21,7 @@ public class UnitManager : MonoBehaviour
      */
     public void NewPlayerUnit(Vector3Int spawnAt)
     {
-        GameObject unitModel = Resources.Load("Prefabs/playerUnit") as GameObject;
+        GameObject unitModel = Resources.Load("Prefabs/Players/playerUnit") as GameObject;
         GameObject spawnedUnit = Instantiate(unitModel, spawnAt, Quaternion.identity);
         
         Unit unit = spawnedUnit.GetComponent<Unit>();
