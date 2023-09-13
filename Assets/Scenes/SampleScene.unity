@@ -325,6 +325,89 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 42.14, y: -159.441, z: -76.047}
+--- !u!1 &806893494
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 806893495}
+  - component: {fileID: 806893496}
+  m_Layer: 0
+  m_Name: ItemManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &806893495
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806893494}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1883348082}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &806893496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806893494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a758f5ac2bafd4aa182b9839640fcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapon:
+    name: 
+    description: 
+    levelReq: 0
+    goldCost: 0
+    id: 0
+    rarity: 0
+    weight: 0
+    weaponType: 0
+    minDamage: 0
+    maxDamage: 0
+    range: 0
+    accuracy: 0
+    actionCost: 0
+  armor:
+    name: 
+    description: 
+    levelReq: 0
+    goldCost: 0
+    id: 0
+    rarity: 0
+    weight: 0
+    armorType: 0
+    hpAmount: 0
+    armorAmount: 0
+  weaponList:
+  - name: 
+    description: 
+    levelReq: 0
+    goldCost: 0
+    id: 0
+    rarity: 0
+    weight: 0
+    weaponType: 0
+    minDamage: 0
+    maxDamage: 0
+    range: 0
+    accuracy: 0
+    actionCost: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,6 +542,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1586870096}
   - component: {fileID: 1586870097}
+  - component: {fileID: 1586870098}
   m_Layer: 0
   m_Name: UnitManager
   m_TagString: Untagged
@@ -505,6 +589,23 @@ MonoBehaviour:
     movementRange: 0
     attackRange: 0
     unitTeam: 2
+--- !u!114 &1586870098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586870095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53ee1e9501eb2954e9c7b9f0ed7222b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: 
+  description: 
+  goldCost: 0
+  id: 0
+  rarity: 0
 --- !u!1 &1883348081
 GameObject:
   m_ObjectHideFlags: 0
@@ -536,6 +637,7 @@ Transform:
   m_Children:
   - {fileID: 1586870096}
   - {fileID: 2075930466}
+  - {fileID: 806893495}
   m_Father: {fileID: 977505443}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
