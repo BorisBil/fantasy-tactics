@@ -3,23 +3,23 @@ public class Item
     [System.Serializable]
     public class Weapon : BaseItem
     {
-        public int weaponType;
+        public int weaponType { get; set; }
 
-        public int minDamage;
-        public int maxDamage;
+        public int minDamage { get; set; }
+        public int maxDamage { get; set; }
 
-        public int range;
+        public int range { get; set; }
 
-        public float accuracy;
-        public float actionCost;
+        public float accuracy { get; set; }
+        public float actionCost { get; set; }
     }
 
     [System.Serializable]
     public class Armor : BaseItem
     {
-        public int armorType;
+        public int armorType { get; set; }
 
-        public int hpAmount;
-        public int armorAmount;
+        public int hpAmount { get; set; }
+        public int armorAmount { get; set; }
     }
 }
