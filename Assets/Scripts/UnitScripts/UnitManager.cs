@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// 
@@ -19,7 +18,7 @@ public class UnitManager : MonoBehaviour
     /*
      * Spawning in a new player unit
      */
-    public void NewPlayerUnit(Vector3Int spawnAt)
+    public Unit NewPlayerUnit(Vector3Int spawnAt)
     {
         GameObject unitModel = Resources.Load("Prefabs/Players/playerUnit") as GameObject;
         GameObject spawnedUnit = Instantiate(unitModel, spawnAt, Quaternion.identity);
@@ -31,7 +30,9 @@ public class UnitManager : MonoBehaviour
         unit.unitType = "Fighter";
 
         unit.unitSpeed = 5;
-        unit.movementRange = 7;
+        unit.baseHP = 5;
+        unit.baseMovement = 5;
+        unit.level = 1;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedUnit;
@@ -40,13 +41,17 @@ public class UnitManager : MonoBehaviour
 
         unit.transform.parent = _unitManager.transform;
 
+        unit.unitTeam = 1;
+
         playerUnits.Add(unit);
+
+        return unit;
     }
 
     /*
      * Spawning in a new enemy unit based on type specified
      */
-    public void SpawnEnemyUnit(EnemyUnitType unitType, Vector3Int spawnAt)
+    public Unit SpawnEnemyUnit(EnemyUnitType unitType, Vector3Int spawnAt)
     {
         GameObject unitModel = unitType.unitModel;
         GameObject spawnedEnemy = (GameObject)Instantiate(unitModel, spawnAt, Quaternion.identity);
@@ -57,9 +62,11 @@ public class UnitManager : MonoBehaviour
         unit.unitDescription = unitType.unitDescription;
         unit.unitType = unitType.unitType;
 
+        unit.level = 1;
+
         unit.unitSpeed = unitType.unitSpeed;
-        unit.movementRange = unitType.movementRange;
-        unit.attackRange = unitType.attackRange;
+        unit.baseMovement = unitType.baseMovement;
+        unit.baseHP = unitType.baseHP;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedEnemy;
@@ -68,7 +75,11 @@ public class UnitManager : MonoBehaviour
 
         unit.transform.parent = _unitManager.transform;
 
+        unit.unitTeam = 2;
+
         enemyUnits.Add(unit);
+
+        return unit;
     }
 
     ///  Enemy unit type table
@@ -85,8 +96,8 @@ public class UnitManager : MonoBehaviour
         public string unitType;
 
         public int unitSpeed;
-        public int movementRange;
-        public int attackRange;
+        public int baseMovement;
+        public int baseHP;
         public int unitTeam;
     }
 }

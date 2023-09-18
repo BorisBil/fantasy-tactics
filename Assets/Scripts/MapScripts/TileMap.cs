@@ -28,14 +28,17 @@ public class TileMap : MonoBehaviour
         graph = desertHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
     }
 
+    /* MOVEMENT RANGE
+     * This function computes the movement range of a unit
+     */
     public List<Node> TileRange(Unit character)
     {
-        /*
-            BFS until depth character movement range, return all nodes traversed
-        */
+        /// BFS until depth character movement range, return all nodes traversed
         Vector3 unitLocation = character.unitPosition;
         Node startNode = graph[(int)unitLocation.x, (int)unitLocation.y, (int)unitLocation.z];
+        
         Dictionary<Node, float> movement_available = new Dictionary<Node, float>();
+        
         movement_available[startNode] = character.movementRange;
 
         List<Node> openList = new List<Node>();
@@ -46,22 +49,21 @@ public class TileMap : MonoBehaviour
         while (openList.Count > 0) 
         {
             Node currentNode = openList.First();
-            Debug.Log(currentNode.location);
             openList.Remove(currentNode);
 
             foreach (Node neighbor in currentNode.neighbors)
             {
                 float new_movement_available = movement_available[currentNode] - neighbor.movementCost;
+                
                 if ((neighbor.isWalkable) && (!movement_available.ContainsKey(neighbor) || new_movement_available > movement_available[neighbor]) && new_movement_available >= 0)
                 {
                     movement_available[neighbor] = new_movement_available;
-                    Debug.Log(new_movement_available);
-                    //neighbor.F = new_movement_available;
-                    //neighbor.previous = currentNode;
+                    
                     if (!openList.Contains(neighbor))
                     {
                         openList.Add(neighbor);
                     }
+                    
                     range.Add(neighbor);
                 }
             }
@@ -94,13 +96,13 @@ public class TileMap : MonoBehaviour
 
         List<Node> openList = new List<Node>();
         Dictionary<Node, float> cost_so_far = new Dictionary<Node, float>();
+        
         openList.Add(startNode);
         cost_so_far[startNode] = 0;
+        
         while (openList.Count > 0) 
         {
             Node currentNode = openList.OrderBy(node => node.F).First();
-
-            Debug.Log(currentNode.location);
 
             openList.Remove(currentNode);
 
@@ -112,12 +114,13 @@ public class TileMap : MonoBehaviour
             foreach (Node neighbor in currentNode.neighbors)
             {
                 float new_cost = cost_so_far[currentNode] + neighbor.movementCost;
+                
                 if ((neighbor.isWalkable) && (!cost_so_far.ContainsKey(neighbor) || new_cost < cost_so_far[neighbor]))
                 {
                     cost_so_far[neighbor] = new_cost;
-                    Debug.Log(new_cost);
                     neighbor.F = new_cost + GetDistance(endNode, neighbor);
                     neighbor.previous = currentNode;
+                    
                     if (!openList.Contains(neighbor))
                     {
                         openList.Add(neighbor);
