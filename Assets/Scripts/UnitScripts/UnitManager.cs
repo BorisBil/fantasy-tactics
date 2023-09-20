@@ -31,17 +31,19 @@ public class UnitManager : MonoBehaviour
 
         unit.unitSpeed = 5;
         unit.baseHP = 5;
-        unit.baseMovement = 5;
+        unit.baseMovement = 10;
         unit.level = 1;
+        unit.actionPoints = 2;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedUnit;
 
         unit.unitPosition = spawnAt;
 
-        unit.transform.parent = _unitManager.transform;
+        unit.transform.parent = _unitManager.transform.Find("PlayerUnits");
 
         unit.unitTeam = 1;
+        unit.isSelectable = true;
 
         playerUnits.Add(unit);
 
@@ -73,9 +75,10 @@ public class UnitManager : MonoBehaviour
 
         unit.unitPosition = spawnAt;
 
-        unit.transform.parent = _unitManager.transform;
+        unit.transform.parent = _unitManager.transform.Find("EnemyUnits");
 
         unit.unitTeam = 2;
+        unit.isSelectable = false;
 
         enemyUnits.Add(unit);
 

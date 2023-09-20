@@ -1,4 +1,7 @@
+using JetBrains.Annotations;
 using System.Collections.Generic;
+using System.ComponentModel;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// 
@@ -18,8 +21,18 @@ public class MouseController : MonoBehaviour
     private Tile tile;
 
     private List<Node> inRange;
-    bool isMoving = false;
+
+    private List<Unit> toMoveQ;
+    private List<Tile> toMoveTo;
+
+    private bool isMoving;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
+
+    private void Start()
+    {
+        toMoveQ = new List<Unit>();
+        toMoveTo = new List<Tile>();
+    }
 
     void Update()
     {
@@ -38,10 +51,19 @@ public class MouseController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (mouseOver == GameObject.Find("playerUnit(Clone)"))
+            if (mouseOver.transform.parent.gameObject == GameObject.Find("PlayerUnits"))
             {
                 selectedUnit = mouseOver;
-                inRange = tileMap.TileRange(selectedUnit.GetComponent<Unit>());
+                unit = selectedUnit.GetComponent<Unit>();
+                
+                if (!unit.isMoving && unit.actionPoints > 1)
+                {
+                    inRange = tileMap.TileRange(unit);
+                }
+                else
+                {
+                    selectedUnit = null;
+                }
             }
             else
             {
@@ -57,16 +79,22 @@ public class MouseController : MonoBehaviour
                 {
                     tile = mouseOver.GetComponent<Tile>();
                     unit = selectedUnit.GetComponent<Unit>();
+                    
                     bool contains = false;
+                   
                     for (int i = 0; i < inRange.Count; i++)
                     {
                         if (inRange[i].location == tile.tileLocation)
                             contains = true;
                     }
-                    if (contains)
+                    
+                    if (contains && !unit.isMoving)
                     {
-                        tileMap.UpdatePath(tile.tileLocation, unit); 
-                        isMoving = true;
+                        tileMap.UpdatePath(tile.tileLocation, unit);
+                        
+                        toMoveQ.Add(unit);
+                        toMoveTo.Add(tile);
+
                         inRange = null;
                         selectedUnit = null;
                     }
@@ -74,11 +102,30 @@ public class MouseController : MonoBehaviour
             }
         }
 
+        if (toMoveQ.Count > 0)
+        {
+            isMoving = true;
+        }
+        else if (toMoveQ.Count == 0)
+        {
+            isMoving = false;
+        }
+
         if (isMoving)
         {
+            unit = toMoveQ[0];
+            tile = toMoveTo[0];
+
+            unit.isMoving = true;
+            
             if (unit.unitPosition == tile.tileLocation)
             {
                 unit.currentPath = null;
+                unit.isMoving = false;
+                unit.actionPoints -= 1;
+
+                toMoveQ.RemoveAt(0);
+                toMoveTo.RemoveAt(0);
             }
 
             if (unit.currentPath != null)

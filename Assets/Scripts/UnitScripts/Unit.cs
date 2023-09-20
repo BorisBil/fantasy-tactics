@@ -34,6 +34,8 @@ public class Unit : MonoBehaviour
 
     public int level;
 
+    public float actionPoints;
+
     public Vector3 unitPosition;
 
     public Item.Weapon weapon;
@@ -41,6 +43,9 @@ public class Unit : MonoBehaviour
     public List<Item.Armor> armor;
 
     public List<Item> inventory;
+
+    public bool isMoving;
+    public bool isSelectable;
 
     public void CalculateStats()
     {

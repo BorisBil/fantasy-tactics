@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// 
-/// MAIN GAME LOOP FILE
+/// MAIN GAME FILE
 /// 
 
 public class GameManager : MonoBehaviour
@@ -26,6 +26,11 @@ public class GameManager : MonoBehaviour
         tileMap.GenerateGrassyHills(10, 10, 5);
 
         Unit unit = unitManager.NewPlayerUnit(new Vector3Int(0, 0, 0));
+        unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Goblin Longsword"]);
+        unit.AddArmor((Item.Armor)itemDatabase.itemDatabase["Goblin Chest Armor"]);
+        unit.CalculateStats();
+
+        unit = unitManager.NewPlayerUnit(new Vector3Int(2, 0, 0));
         unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Goblin Longsword"]);
         unit.AddArmor((Item.Armor)itemDatabase.itemDatabase["Goblin Chest Armor"]);
         unit.CalculateStats();
