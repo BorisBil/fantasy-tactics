@@ -7,7 +7,7 @@ using UnityEngine;
 /// 
 /// MOUSE INPUT CONTROLS
 /// 
-public class MouseController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public TileMap tileMap;
