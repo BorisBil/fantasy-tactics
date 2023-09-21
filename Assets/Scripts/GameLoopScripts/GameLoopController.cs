@@ -16,7 +16,7 @@ public class GameLoopController : MonoBehaviour
         Debug.Log("Turn being ended");
         /// Clean up, lead into AI Behavior
         /// 
-        StartPlayerTurn();
+        StartCoroutine(timer());
     }
 
     public void StartPlayerTurn()
@@ -27,6 +27,15 @@ public class GameLoopController : MonoBehaviour
         {
             unit.actionPoints = 2;
         }
+
+
+        endTurn.ShowButton();
+    }
+
+    IEnumerator timer()
+    {
+        yield return new WaitForSecondsRealtime(4);
+        StartPlayerTurn();
     }
 
 }

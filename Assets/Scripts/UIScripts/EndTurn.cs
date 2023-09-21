@@ -20,7 +20,6 @@ public class EndTurn : MonoBehaviour
         gameLoopController.EndPlayerTurn();
         Debug.Log("Ending the turn");
         HideButton();
-        ShowButton();
     }
 
     void HideButton()
