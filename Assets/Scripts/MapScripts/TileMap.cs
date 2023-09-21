@@ -11,7 +11,7 @@ public class TileMap : MonoBehaviour
     public GrassyHills grassyHills;
     public DesertHills desertHills;
 
-    private Node[,,] graph;
+    public Node[,,] graph;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     public void GenerateGrassyHills(int mapSizeX, int mapSizeY, int mapSizeZ)

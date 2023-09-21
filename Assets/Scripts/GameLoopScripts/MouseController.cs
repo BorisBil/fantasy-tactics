@@ -97,6 +97,8 @@ public class MouseController : MonoBehaviour
 
                         inRange = null;
                         selectedUnit = null;
+
+                        tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
                     }
                 }
             }
@@ -126,6 +128,8 @@ public class MouseController : MonoBehaviour
 
                 toMoveQ.RemoveAt(0);
                 toMoveTo.RemoveAt(0);
+
+                tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
             }
 
             if (unit.currentPath != null)
