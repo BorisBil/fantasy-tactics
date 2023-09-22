@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +16,6 @@ public class EndTurn : MonoBehaviour
     public void EndPlayerTurn()
     {
         gameLoopController.EndPlayerTurn();
-        Debug.Log("Ending the turn");
         HideButton();
     }
 
@@ -29,7 +26,6 @@ public class EndTurn : MonoBehaviour
 
     public void ShowButton()
     {
-        Debug.Log("Showing button");
         endTurn.gameObject.SetActive(true);
     }
 }

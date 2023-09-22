@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// 
@@ -43,6 +42,8 @@ public class Unit : MonoBehaviour
     public List<Item.Armor> armor;
 
     public List<Item> inventory;
+
+    public List<Unit> attackableUnits;
 
     public bool isMoving;
     public bool isSelectable;

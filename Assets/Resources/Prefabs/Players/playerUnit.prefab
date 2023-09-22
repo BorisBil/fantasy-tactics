@@ -150,14 +150,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d10b3e08c9dfd84d8d2e9813f41c49b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventory: {fileID: 0}
   name: 
   unitModel: {fileID: 0}
   unitObject: {fileID: 0}
   unitDescription: 
   unitType: 
   unitSpeed: 0
+  baseMovement: 0
   movementRange: 0
+  baseHP: 0
+  totalHP: 0
+  armorWeight: 0
+  armorHP: 0
+  armorAP: 0
   attackRange: 0
   unitTeam: 0
+  level: 0
+  actionPoints: 0
   unitPosition: {x: 0, y: 0, z: 0}
+  weapon: {fileID: 0}
+  shield: {fileID: 0}
+  armor: []
+  inventory: []
+  isMoving: 0
+  isSelectable: 0

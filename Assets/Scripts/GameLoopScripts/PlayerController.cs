@@ -1,7 +1,4 @@
-using JetBrains.Annotations;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// 
@@ -13,25 +10,32 @@ public class PlayerController : MonoBehaviour
     public TileMap tileMap;
 
     public UnitManager unitManager;
+    public GameLoopController gameLoopController;
 
     public GameObject mouseOver;
     public GameObject selectedUnit;
+    public GameObject selectedEnemy;
 
     private Unit unit;
     private Tile tile;
 
-    private List<Node> inRange;
+    private List<Node> inRangeTiles;
 
     private List<Unit> toMoveQ;
     private List<Tile> toMoveTo;
 
-    private bool isMoving;
+    private bool attackMode;
+    private bool moveMode;
+
+    public bool isMoving;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     private void Start()
     {
         toMoveQ = new List<Unit>();
         toMoveTo = new List<Tile>();
+
+        SetMoveMode();
     }
 
     void Update()
@@ -42,108 +46,185 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hitInfo))
         {
             GameObject hitObject = hitInfo.transform.parent.gameObject;
+            
             if (hitObject == GameObject.Find("Map"))
             {
                 hitObject = hitInfo.transform.gameObject;
             }
+            
             mouseOver = hitObject;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (moveMode)
         {
-            if (mouseOver.transform.parent.gameObject == GameObject.Find("PlayerUnits"))
+            if (Input.GetMouseButtonDown(0))
             {
-                selectedUnit = mouseOver;
-                unit = selectedUnit.GetComponent<Unit>();
-                
-                if (!unit.isMoving && unit.actionPoints > 1)
+                if (mouseOver.transform.parent.gameObject == GameObject.Find("PlayerUnits"))
                 {
-                    inRange = tileMap.TileRange(unit);
+                    selectedUnit = mouseOver;
+                    unit = selectedUnit.GetComponent<Unit>();
+
+                    if (unit.attackableUnits.Count > 0 && unit.actionPoints >= 0)
+                    {
+                        gameLoopController.attackButton.ShowButton();
+                    }
+                    else
+                    {
+                        gameLoopController.attackButton.HideButton();
+                    }
+
+                    if (!unit.isMoving && unit.actionPoints > 1)
+                    {
+                        inRangeTiles = tileMap.TileRange(unit);
+
+                        gameLoopController.ListAttackSelectable(unit);
+
+                        if (unit.attackableUnits.Count > 0)
+                        {
+                            gameLoopController.attackButton.ShowButton();
+                        }
+                        else
+                        {
+                            gameLoopController.attackButton.HideButton();
+                        }
+                    }
+                    else if (unit.actionPoints <= 0)
+                    {
+                        selectedUnit = null;
+                        gameLoopController.attackButton.HideButton();
+                    }
                 }
-                else
+                else if (!mouseOver.transform.parent.gameObject == GameObject.Find("Canvas"))
                 {
                     selectedUnit = null;
                 }
             }
-            else
+
+            if (Input.GetMouseButtonDown(1))
             {
-                selectedUnit = null;
+                if (selectedUnit && selectedUnit.GetComponent<Unit>().actionPoints > 1 && !selectedUnit.GetComponent<Unit>().isMoving)
+                {
+                    if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
+                    {
+                        tile = mouseOver.GetComponent<Tile>();
+                        unit = selectedUnit.GetComponent<Unit>();
+
+                        bool contains = false;
+
+                        for (int i = 0; i < inRangeTiles.Count; i++)
+                        {
+                            if (inRangeTiles[i].location == tile.tileLocation)
+                                contains = true;
+                        }
+
+                        if (contains && !unit.isMoving)
+                        {
+                            tileMap.UpdatePath(tile.tileLocation, unit);
+
+                            toMoveQ.Add(unit);
+                            toMoveTo.Add(tile);
+
+                            inRangeTiles = null;
+                            
+                            tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
+                        }
+                    }
+                }
+            }
+
+            if (toMoveQ.Count > 0)
+            {
+                isMoving = true;
+            }
+            else if (toMoveQ.Count == 0)
+            {
+                isMoving = false;
+            }
+
+            if (isMoving)
+            {
+                unit = toMoveQ[0];
+                tile = toMoveTo[0];
+
+                unit.isMoving = true;
+
+                if (unit.unitPosition == tile.tileLocation)
+                {
+                    unit.currentPath = null;
+                    unit.isMoving = false;
+                    unit.actionPoints -= 1;
+
+                    toMoveQ.RemoveAt(0);
+                    toMoveTo.RemoveAt(0);
+
+                    gameLoopController.ListAttackSelectable(unit);
+
+                    if (unit.attackableUnits.Count > 0)
+                    {
+                        gameLoopController.attackButton.ShowButton();
+                    }
+                    else
+                    {
+                        gameLoopController.attackButton.HideButton();
+                    }
+
+                    tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
+                }
+
+                if (unit.currentPath != null)
+                {
+                    var step = unit.unitSpeed * Time.deltaTime;
+                    unit.transform.position = Vector3.MoveTowards(unit.transform.position, unit.currentPath[0].location, step);
+
+                    if (unit.transform.position == unit.currentPath[0].location)
+                    {
+                        unit.unitPosition = unit.currentPath[0].location;
+                        unit.transform.position = unit.unitPosition;
+                        unit.currentPath.RemoveAt(0);
+                    }
+                }
             }
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (attackMode)
         {
-            if (selectedUnit)
+            if (Input.GetMouseButtonDown(0))
             {
-                if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
+                if (mouseOver.transform.parent.gameObject == GameObject.Find("EnemyUnits"))
                 {
-                    tile = mouseOver.GetComponent<Tile>();
-                    unit = selectedUnit.GetComponent<Unit>();
+                    selectedEnemy = mouseOver;
+                    Unit enemy = selectedEnemy.GetComponent<Unit>();
                     
-                    bool contains = false;
-                   
-                    for (int i = 0; i < inRange.Count; i++)
+                    if (unit.attackableUnits.Contains(enemy))
                     {
-                        if (inRange[i].location == tile.tileLocation)
-                            contains = true;
-                    }
-                    
-                    if (contains && !unit.isMoving)
-                    {
-                        tileMap.UpdatePath(tile.tileLocation, unit);
+                        Unit unit = selectedUnit.GetComponent<Unit>();
+                        gameLoopController.CalculateAttack(unit, enemy);
                         
-                        toMoveQ.Add(unit);
-                        toMoveTo.Add(tile);
-
-                        inRange = null;
                         selectedUnit = null;
+                        selectedEnemy = null;
 
-                        tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
+                        gameLoopController.attackButton.HideButton();
+                        SetMoveMode();
                     }
                 }
-            }
-        }
-
-        if (toMoveQ.Count > 0)
-        {
-            isMoving = true;
-        }
-        else if (toMoveQ.Count == 0)
-        {
-            isMoving = false;
-        }
-
-        if (isMoving)
-        {
-            unit = toMoveQ[0];
-            tile = toMoveTo[0];
-
-            unit.isMoving = true;
-            
-            if (unit.unitPosition == tile.tileLocation)
-            {
-                unit.currentPath = null;
-                unit.isMoving = false;
-                unit.actionPoints -= 1;
-
-                toMoveQ.RemoveAt(0);
-                toMoveTo.RemoveAt(0);
-
-                tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
-            }
-
-            if (unit.currentPath != null)
-            {
-                var step = unit.unitSpeed * Time.deltaTime;
-                unit.transform.position = Vector3.MoveTowards(unit.transform.position, unit.currentPath[0].location, step);
-
-                if (unit.transform.position == unit.currentPath[0].location)
+                else
                 {
-                    unit.unitPosition = unit.currentPath[0].location;
-                    unit.transform.position = unit.unitPosition;
-                    unit.currentPath.RemoveAt(0);
+                    SetMoveMode();
+                    selectedUnit = null;
                 }
             }
         }
+    }
+
+    public void SetMoveMode()
+    {
+        attackMode = false;
+        moveMode = true;
+    }
+
+    public void SetAttackMode()
+    {
+        attackMode = true;
+        moveMode = false;
     }
 }
