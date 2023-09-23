@@ -19,6 +19,8 @@ public class GameLoopController : MonoBehaviour
     {
         /// Clean up, lead into AI Behavior
         /// 
+        playerController.transitionTurn = true;
+        attackButton.HideButton();
         StartCoroutine(timer());
     }
 
@@ -31,7 +33,7 @@ public class GameLoopController : MonoBehaviour
             ListAttackSelectable(unit);
         }
 
-        endTurnButton.ShowButton();
+        playerController.transitionTurn = false;
     }
 
     public void ListAttackSelectable(Unit unit)

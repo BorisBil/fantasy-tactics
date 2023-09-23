@@ -19,7 +19,7 @@ public class EndTurn : MonoBehaviour
         HideButton();
     }
 
-    void HideButton()
+    public void HideButton()
     {
         endTurn.gameObject.SetActive(false);
     }

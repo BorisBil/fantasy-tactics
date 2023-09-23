@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private bool moveMode;
 
     public bool isMoving;
+    public bool transitionTurn;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     private void Start()
@@ -143,6 +144,8 @@ public class PlayerController : MonoBehaviour
 
             if (isMoving)
             {
+                gameLoopController.endTurnButton.HideButton();
+
                 unit = toMoveQ[0];
                 tile = toMoveTo[0];
 
@@ -159,13 +162,16 @@ public class PlayerController : MonoBehaviour
 
                     gameLoopController.ListAttackSelectable(unit);
 
-                    if (unit.attackableUnits.Count > 0)
-                    {
-                        gameLoopController.attackButton.ShowButton();
-                    }
-                    else
-                    {
-                        gameLoopController.attackButton.HideButton();
+                    if (selectedUnit != null && selectedUnit.GetComponent<Unit>() == unit)
+                    { 
+                        if (unit.attackableUnits.Count > 0)
+                        {
+                            gameLoopController.attackButton.ShowButton();
+                        }
+                        else
+                        {
+                            gameLoopController.attackButton.HideButton();
+                        }
                     }
 
                     tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
@@ -183,6 +189,10 @@ public class PlayerController : MonoBehaviour
                         unit.currentPath.RemoveAt(0);
                     }
                 }
+            }
+            else if (!isMoving && !transitionTurn)
+            {
+                gameLoopController.endTurnButton.ShowButton();
             }
         }
 
