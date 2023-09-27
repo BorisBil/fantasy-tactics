@@ -9,6 +9,7 @@ public class GameLoopController : MonoBehaviour
 {
     public PlayerController playerController;
     public UnitManager unitManager;
+    public AIBehaviors AIbehaviors;
     
     public EndTurn endTurnButton;
     public Attack attackButton;
@@ -21,7 +22,7 @@ public class GameLoopController : MonoBehaviour
         /// 
         playerController.transitionTurn = true;
         attackButton.HideButton();
-        StartCoroutine(timer());
+        AIbehaviors.AITurn();
     }
 
     public void StartPlayerTurn()
@@ -88,6 +89,16 @@ public class GameLoopController : MonoBehaviour
         if (hitRoll > chancetohit)
         {
             Debug.Log("Miss!");
+        }
+
+        CheckIfDead(enemy);
+    }
+
+    public void CheckIfDead(Unit unit)
+    {
+        if (unit.totalHP <= 0)
+        {
+            unitManager.UnitDeath(unit);
         }
     }
 

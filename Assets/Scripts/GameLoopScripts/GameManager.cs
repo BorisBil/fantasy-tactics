@@ -39,4 +39,9 @@ public class GameManager : MonoBehaviour
         unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Goblin Longsword"]);
         unit.CalculateStats();
     }
+
+    public void GameLost()
+    {
+        Debug.Log("Game lost!");
+    }
 }

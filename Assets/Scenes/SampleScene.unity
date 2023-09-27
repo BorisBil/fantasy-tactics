@@ -1146,6 +1146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 992f70db84430e04b8b4bc01886894b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 1883348083}
   _unitManager: {fileID: 1586870095}
   playerUnits: []
   enemyUnits: []
@@ -1458,6 +1459,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerController: {fileID: 2075930465}
   unitManager: {fileID: 1586870097}
+  AIbehaviors: {fileID: 0}
   endTurnButton: {fileID: 1157064845}
   attackButton: {fileID: 727289976}
 --- !u!1 &2075930464
@@ -1496,6 +1498,7 @@ MonoBehaviour:
   selectedUnit: {fileID: 0}
   selectedEnemy: {fileID: 0}
   isMoving: 0
+  transitionTurn: 0
 --- !u!4 &2075930466
 Transform:
   m_ObjectHideFlags: 0

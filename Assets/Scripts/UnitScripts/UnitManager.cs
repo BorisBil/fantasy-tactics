@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// 
@@ -7,6 +8,8 @@ using UnityEngine;
 public class UnitManager : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
+    public GameManager gameManager;
+
     public GameObject _unitManager;
 
     public List<Unit> playerUnits;
@@ -56,7 +59,7 @@ public class UnitManager : MonoBehaviour
     public Unit SpawnEnemyUnit(EnemyUnitType unitType, Vector3Int spawnAt)
     {
         GameObject unitModel = unitType.unitModel;
-        GameObject spawnedEnemy = (GameObject)Instantiate(unitModel, spawnAt, Quaternion.identity);
+        GameObject spawnedEnemy = Instantiate(unitModel, spawnAt, Quaternion.identity);
 
         Unit unit = spawnedEnemy.GetComponent<Unit>();
 
@@ -83,6 +86,38 @@ public class UnitManager : MonoBehaviour
         enemyUnits.Add(unit);
 
         return unit;
+    }
+
+    public void UnitDeath(Unit unit)
+    {
+        if (unit.unitTeam == 1)
+        {
+            PlayerUnitDeath(unit);
+        }
+
+        if (unit.unitTeam == 2)
+        {
+            EnemyUnitDeath(unit);
+        }
+    }
+
+    public void PlayerUnitDeath(Unit unit)
+    {
+        playerUnits.Remove(unit);
+
+        Destroy(unit.gameObject);
+
+        if (playerUnits.Count == 0)
+        {
+            gameManager.GameLost();
+        }
+    }
+
+    public void EnemyUnitDeath(Unit unit)
+    {
+        enemyUnits.Remove(unit);
+
+        Destroy(unit.gameObject);
     }
 
     ///  Enemy unit type table
