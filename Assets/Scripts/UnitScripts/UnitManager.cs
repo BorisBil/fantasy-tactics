@@ -34,7 +34,7 @@ public class UnitManager : MonoBehaviour
 
         unit.unitSpeed = 5;
         unit.baseHP = 5;
-        unit.baseMovement = 10;
+        unit.baseMovement = 5;
         unit.level = 1;
         unit.actionPoints = 2;
 

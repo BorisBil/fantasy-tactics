@@ -86,11 +86,6 @@ public class TileMap : MonoBehaviour
      */
     public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3 unitLocation)
     {
-        if (graph[targetLocation.x, targetLocation.y, targetLocation.z].isWalkable == false)
-        {
-            return null;
-        }
-
         Node startNode = graph[(int)unitLocation.x, (int)unitLocation.y, (int)unitLocation.z];
         Node endNode = graph[targetLocation.x, targetLocation.y, targetLocation.z];
 
@@ -149,10 +144,10 @@ public class TileMap : MonoBehaviour
     }
 
     /// Gets the (3D Version?) Manhattan distance between nodes
-    private int GetDistance(Node start, Node neighbor)
+    public int GetDistance(Node start, Node end)
     {
-        return  Mathf.Abs(start.location.x - neighbor.location.x) + 
-                Mathf.Abs(start.location.y - neighbor.location.y) + 
-                Mathf.Abs(start.location.z - neighbor.location.z);
+        return  Mathf.Abs(start.location.x - end.location.x) + 
+                Mathf.Abs(start.location.y - end.location.y) + 
+                Mathf.Abs(start.location.z - end.location.z);
     }
 }

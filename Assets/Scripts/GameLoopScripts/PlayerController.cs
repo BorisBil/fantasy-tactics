@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// 
-/// MOUSE INPUT CONTROLS
+/// PLAYER'S VIEW OF THE GAME
 /// 
 public class PlayerController : MonoBehaviour
 {
@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
                     {
                         inRangeTiles = tileMap.TileRange(unit);
 
-                        gameLoopController.ListAttackSelectable(unit);
+                        gameLoopController.ListPlayerAttackSelectable(unit);
 
                         if (unit.attackableUnits.Count > 0)
                         {
@@ -110,24 +110,29 @@ public class PlayerController : MonoBehaviour
                         tile = mouseOver.GetComponent<Tile>();
                         unit = selectedUnit.GetComponent<Unit>();
 
-                        bool contains = false;
-
-                        for (int i = 0; i < inRangeTiles.Count; i++)
+                        if (tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable)
                         {
-                            if (inRangeTiles[i].location == tile.tileLocation)
-                                contains = true;
-                        }
+                            bool contains = false;
 
-                        if (contains && !unit.isMoving)
-                        {
-                            tileMap.UpdatePath(tile.tileLocation, unit);
+                            for (int i = 0; i < inRangeTiles.Count; i++)
+                            {
+                                if (inRangeTiles[i].location == tile.tileLocation)
+                                    contains = true;
+                            }
 
-                            toMoveQ.Add(unit);
-                            toMoveTo.Add(tile);
+                            if (contains && !unit.isMoving)
+                            {
+                                tileMap.UpdatePath(tile.tileLocation, unit);
 
-                            inRangeTiles = null;
-                            
-                            tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
+                                toMoveQ.Add(unit);
+                                toMoveTo.Add(tile);
+
+                                inRangeTiles = null;
+
+                                tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
+                                tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
+
+                            }
                         }
                     }
                 }
@@ -160,7 +165,7 @@ public class PlayerController : MonoBehaviour
                     toMoveQ.RemoveAt(0);
                     toMoveTo.RemoveAt(0);
 
-                    gameLoopController.ListAttackSelectable(unit);
+                    gameLoopController.ListPlayerAttackSelectable(unit);
 
                     if (selectedUnit != null && selectedUnit.GetComponent<Unit>() == unit)
                     { 
@@ -173,8 +178,6 @@ public class PlayerController : MonoBehaviour
                             gameLoopController.attackButton.HideButton();
                         }
                     }
-
-                    tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
                 }
 
                 if (unit.currentPath != null)

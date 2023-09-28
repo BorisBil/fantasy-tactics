@@ -52,6 +52,11 @@ public class Item : ScriptableObject
         {
 
         }
+
+        public class Unarmed : Weapon
+        {
+
+        }
     }
 
     public class Armor : Item

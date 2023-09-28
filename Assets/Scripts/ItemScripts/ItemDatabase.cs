@@ -27,6 +27,34 @@ public class ItemDatabase
         Item.Weapon.Crossbow crossbow = ScriptableObject.CreateInstance<Item.Weapon.Crossbow>();
         Item.Weapon.Shortsword shortsword = ScriptableObject.CreateInstance<Item.Weapon.Shortsword>();
         Item.Weapon.Longsword longsword = ScriptableObject.CreateInstance<Item.Weapon.Longsword>();
+        Item.Weapon.Unarmed unarmed = ScriptableObject.CreateInstance<Item.Weapon.Unarmed>();
+
+        /*
+         * UNARMED
+         */
+
+        unarmed.name = "Zombie Fists";
+        unarmed.description = "You have no weapon!";
+        unarmed.weaponType = "Hands";
+
+        unarmed.minDamage = 1;
+        unarmed.maxDamage = 3;
+        unarmed.range = 1;
+        unarmed.accuracy = 0.4f;
+        unarmed.actionCost = 1;
+
+        unarmed.levelReq = 1;
+        unarmed.goldCost = 0;
+        unarmed.rarity = 0;
+
+        unarmed.weight = 0;
+
+        unarmed.id = 1;
+        addWeaponToDatabase(unarmed);
+
+        /*
+         * UNARMED
+         */
 
         /*
          * GOBLIN WEAPONS

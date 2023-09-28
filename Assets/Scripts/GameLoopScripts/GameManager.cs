@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour
         unit.AddArmor((Item.Armor)itemDatabase.itemDatabase["Goblin Chest Armor"]);
         unit.CalculateStats();
 
-        unit = unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[0], new Vector3Int(9, 9, 0));
-        unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Goblin Longsword"]);
+        unit = unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[1], new Vector3Int(8, 8, 0));
+        unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Zombie Fists"]);
         unit.CalculateStats();
     }
 

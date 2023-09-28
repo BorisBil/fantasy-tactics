@@ -16,10 +16,10 @@ public class GameLoopController : MonoBehaviour
 
     float chancetohit;
 
+    public bool AITurn;
+
     public void EndPlayerTurn()
     {
-        /// Clean up, lead into AI Behavior
-        /// 
         playerController.transitionTurn = true;
         attackButton.HideButton();
         AIbehaviors.AITurn();
@@ -27,17 +27,21 @@ public class GameLoopController : MonoBehaviour
 
     public void StartPlayerTurn()
     {
+        AIbehaviors.isAITurn = false;
+
+        timer();
+
         foreach (Unit unit in unitManager.playerUnits)
         {
             unit.actionPoints = 2;
 
-            ListAttackSelectable(unit);
+            ListPlayerAttackSelectable(unit);
         }
 
         playerController.transitionTurn = false;
     }
 
-    public void ListAttackSelectable(Unit unit)
+    public void ListPlayerAttackSelectable(Unit unit)
     {
         /// Want to modify this later to only select targets in vision range
         /// 
@@ -59,8 +63,35 @@ public class GameLoopController : MonoBehaviour
 
                     if (!Physics.Raycast(ray, out hitInfo, distance))
                     {
-                        Debug.Log("Can attack");
-                        Debug.Log(enemy.unitPosition);
+                        unit.attackableUnits.Add(enemy);
+                    }
+                }
+            }
+        }
+    }
+
+    public void ListEnemyAttackSelectable(Unit unit)
+    {
+        /// Want to modify this later to only select targets in vision range
+        /// 
+        unit.attackableUnits.Clear();
+
+        if (unit.actionPoints - unit.weapon.actionCost >= 0)
+        {
+            foreach (Unit enemy in unitManager.playerUnits)
+            {
+                float distance = DistanceBetweenUnits(unit, enemy);
+
+                if (distance <= unit.attackRange)
+                {
+                    Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 0.50f);
+                    Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 0.50f);
+
+                    Ray ray = new Ray(rayCastUnitCoords, rayCastEnemyCoords);
+                    RaycastHit hitInfo;
+
+                    if (!Physics.Raycast(ray, out hitInfo, distance))
+                    {
                         unit.attackableUnits.Add(enemy);
                     }
                 }
@@ -108,7 +139,7 @@ public class GameLoopController : MonoBehaviour
         StartPlayerTurn();
     }
 
-    private float DistanceBetweenUnits(Unit sender, Unit reciever)
+    public float DistanceBetweenUnits(Unit sender, Unit reciever)
     {
         return Mathf.Abs(sender.unitPosition.x - reciever.unitPosition.x) +
                Mathf.Abs(sender.unitPosition.y - reciever.unitPosition.y) +
