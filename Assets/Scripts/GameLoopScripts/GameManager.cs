@@ -35,9 +35,14 @@ public class GameManager : MonoBehaviour
         unit.AddArmor((Item.Armor)itemDatabase.itemDatabase["Goblin Chest Armor"]);
         unit.CalculateStats();
 
-        unit = unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[1], new Vector3Int(8, 8, 0));
-        unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Zombie Fists"]);
-        unit.CalculateStats();
+        int randomEnemies = (int)Mathf.Round(Random.Range(1.0f, 4.0f));
+
+        for (int i = 0; i < randomEnemies; i++)
+        {
+            unit = unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[1], new Vector3Int(9 - i, 9, 0));
+            unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Zombie Fists"]);
+            unit.CalculateStats();
+        }
     }
 
     public void GameLost()

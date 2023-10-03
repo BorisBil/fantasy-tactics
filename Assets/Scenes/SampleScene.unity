@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 386977507}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -201,6 +201,8 @@ MonoBehaviour:
   unitManager: {fileID: 1586870097}
   tileMap: {fileID: 161391764}
   gameLoopController: {fileID: 1898208015}
+  movedUnits: []
+  isAITurn: 0
 --- !u!1 &161391762
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,7 +233,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1968350679}
+  - {fileID: 903754776}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -265,20 +269,47 @@ MonoBehaviour:
   - name: Grass
     tileVisualPrefab: {fileID: 5497570994063074875, guid: 9a016cba11958e344844bf247fb7e278, type: 3}
     isWalkable: 1
+    isRamp: 0
     movementCost: 1
   - name: Swamp
     tileVisualPrefab: {fileID: 4453126638398938434, guid: dc9ca605e3b86fd4b8937613ad683e6e, type: 3}
     isWalkable: 1
-    movementCost: 3
+    isRamp: 0
+    movementCost: 2
   - name: Mountain
     tileVisualPrefab: {fileID: 5689061405100041663, guid: ba5896dbee2dc2d40ae9185f2381a07d, type: 3}
     isWalkable: 1
-    movementCost: 5
-  - name: Wall
-    tileVisualPrefab: {fileID: 2518862159114457414, guid: 0bb02c0a6313f9c469ca091e55ba43be, type: 3}
-    isWalkable: 0
-    movementCost: 1000
+    isRamp: 0
+    movementCost: 4
+  grassyHillsProps:
+  - name: Big Rock
+    propVisualPrefab: {fileID: 7524149732388544378, guid: ac92a4a76be64d648964ab799c1fc1e9, type: 3}
+    isStructure: 0
+    blocksTile: 1
+    coverType: Full
+  - name: Small Rock
+    propVisualPrefab: {fileID: 7524149732388544378, guid: 665715f1b82211c4db947dc2ef1a656b, type: 3}
+    isStructure: 0
+    blocksTile: 0
+    coverType: Half
+  - name: Dead Tree Base
+    propVisualPrefab: {fileID: 7524149732388544378, guid: 49d3035828bf3b54c836b26663122cb9, type: 3}
+    isStructure: 1
+    blocksTile: 1
+    coverType: Full
+  - name: Dead Tree Mid
+    propVisualPrefab: {fileID: 7524149732388544378, guid: b012bebab64cd55478237561862488da, type: 3}
+    isStructure: 1
+    blocksTile: 1
+    coverType: Half
+  - name: Dead Tree End
+    propVisualPrefab: {fileID: 7524149732388544378, guid: c2c28c276f219354d9853895fa4f062d, type: 3}
+    isStructure: 1
+    blocksTile: 0
+    coverType: Half
   map: {fileID: 161391762}
+  tiles: {fileID: 1968350678}
+  props: {fileID: 903754775}
 --- !u!114 &161391766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,20 +326,88 @@ MonoBehaviour:
   - name: Desert
     tileVisualPrefab: {fileID: 5497570994063074875, guid: dc8922797f3e522409f0f5b7e0f5a732, type: 3}
     isWalkable: 0
+    isRamp: 0
     movementCost: 0
   - name: Oasis
     tileVisualPrefab: {fileID: 5497570994063074875, guid: f0c2903ffe4956949ad1de93ddcf7f2e, type: 3}
     isWalkable: 1
+    isRamp: 0
     movementCost: 3
   - name: Mountain
     tileVisualPrefab: {fileID: 5497570994063074875, guid: 10344ea0f41c2a64d84d206e0ace0e93, type: 3}
     isWalkable: 1
+    isRamp: 0
     movementCost: 5
   - name: Wall
     tileVisualPrefab: {fileID: 5497570994063074875, guid: c67c05e5bb269ef4e8d6c1fc95a3cdd1, type: 3}
     isWalkable: 0
+    isRamp: 0
     movementCost: 1000
   map: {fileID: 0}
+--- !u!850595691 &386977507
+LightingSettings:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 6
+  m_GIWorkflowMode: 1
+  m_EnableBakedLightmaps: 1
+  m_EnableRealtimeLightmaps: 0
+  m_RealtimeEnvironmentLighting: 1
+  m_BounceScale: 1
+  m_AlbedoBoost: 1
+  m_IndirectOutputScale: 1
+  m_UsingShadowmask: 1
+  m_BakeBackend: 1
+  m_LightmapMaxSize: 1024
+  m_BakeResolution: 40
+  m_Padding: 2
+  m_LightmapCompression: 3
+  m_AO: 0
+  m_AOMaxDistance: 1
+  m_CompAOExponent: 1
+  m_CompAOExponentDirect: 0
+  m_ExtractAO: 0
+  m_MixedBakeMode: 2
+  m_LightmapsBakeMode: 1
+  m_FilterMode: 1
+  m_LightmapParameters: {fileID: 15204, guid: 0000000000000000f000000000000000, type: 0}
+  m_ExportTrainingData: 0
+  m_TrainingDataDestination: TrainingData
+  m_RealtimeResolution: 2
+  m_ForceWhiteAlbedo: 0
+  m_ForceUpdates: 0
+  m_FinalGather: 0
+  m_FinalGatherRayCount: 256
+  m_FinalGatherFiltering: 1
+  m_PVRCulling: 1
+  m_PVRSampling: 1
+  m_PVRDirectSampleCount: 32
+  m_PVRSampleCount: 512
+  m_PVREnvironmentSampleCount: 256
+  m_PVREnvironmentReferencePointCount: 2048
+  m_LightProbeSampleCountMultiplier: 4
+  m_PVRBounces: 2
+  m_PVRMinBounces: 2
+  m_PVREnvironmentImportanceSampling: 1
+  m_PVRFilteringMode: 1
+  m_PVRDenoiserTypeDirect: 1
+  m_PVRDenoiserTypeIndirect: 1
+  m_PVRDenoiserTypeAO: 1
+  m_PVRFilterTypeDirect: 0
+  m_PVRFilterTypeIndirect: 0
+  m_PVRFilterTypeAO: 0
+  m_PVRFilteringGaussRadiusDirect: 1
+  m_PVRFilteringGaussRadiusIndirect: 5
+  m_PVRFilteringGaussRadiusAO: 2
+  m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+  m_PVRFilteringAtrousPositionSigmaIndirect: 2
+  m_PVRFilteringAtrousPositionSigmaAO: 1
+  m_PVRTiledBaking: 0
+  m_NumRaysToShootPerTexel: -1
+  m_RespectSceneVisibilityWhenBakingGI: 0
 --- !u!1 &391545036
 GameObject:
   m_ObjectHideFlags: 0
@@ -720,6 +819,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9474186b3e4d5d47aa40a3fa0149eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &903754775
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 903754776}
+  m_Layer: 0
+  m_Name: Props
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &903754776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903754775}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 161391763}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1519,6 +1649,37 @@ MonoBehaviour:
   endTurnButton: {fileID: 1157064845}
   attackButton: {fileID: 727289976}
   AITurn: 0
+--- !u!1 &1968350678
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1968350679}
+  m_Layer: 0
+  m_Name: Tiles
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1968350679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968350678}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 161391763}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2075930464
 GameObject:
   m_ObjectHideFlags: 0

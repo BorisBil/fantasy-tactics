@@ -13,6 +13,7 @@ public class Node
     public float F; //{ get { return G + H; } }
 
     public bool isWalkable;
+    public bool isRamp;
     public float movementCost;
 
     public Node previous;

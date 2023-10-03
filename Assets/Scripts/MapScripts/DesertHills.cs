@@ -4,7 +4,7 @@ using UnityEngine;
 public class DesertHills : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
-    public TileSets.DesertHills[] desertHills;
+    public TileSets.DesertHillTiles[] desertHills;
 
     private int[,,] tileTypeMap;
 
@@ -69,7 +69,7 @@ public class DesertHills : MonoBehaviour
         foreach (var item in tileMapList)
         {
             /// Instantiating the tiles after setting their type based on the map graph
-            TileSets.DesertHills type = desertHills[tileTypeMap[item.x, item.y, item.z]];
+            TileSets.DesertHillTiles type = desertHills[tileTypeMap[item.x, item.y, item.z]];
             GameObject tile = Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
             tile.transform.parent = map.transform;
 

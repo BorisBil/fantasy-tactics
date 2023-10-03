@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         {
             GameObject hitObject = hitInfo.transform.parent.gameObject;
             
-            if (hitObject == GameObject.Find("Map"))
+            if (hitObject == GameObject.Find("Tiles"))
             {
                 hitObject = hitInfo.transform.gameObject;
             }
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (selectedUnit && selectedUnit.GetComponent<Unit>().actionPoints > 1 && !selectedUnit.GetComponent<Unit>().isMoving)
                 {
-                    if (mouseOver.transform.parent.gameObject == GameObject.Find("Map"))
+                    if (mouseOver.transform.parent.gameObject == GameObject.Find("Tiles"))
                     {
                         tile = mouseOver.GetComponent<Tile>();
                         unit = selectedUnit.GetComponent<Unit>();

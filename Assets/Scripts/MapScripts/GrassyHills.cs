@@ -1,17 +1,25 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 public class GrassyHills : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
-    public TileSets.GrassyHills[] grassyHills;
+    public TileSets.GrassyHillTiles[] grassyHills;
+    public PropSets.GrassyHillProps[] grassyHillsProps;
 
     private int[,,] tileTypeMap;
+    private int[,,] propTypeMap;
 
     private List<Vector3Int> tileMapList;
     private List<Vector3Int> graphNodeList;
+    private List<Vector3Int> propTypeList;
+    private List<Prop> propList;
 
     public GameObject map;
+    public GameObject tiles;
+    public GameObject props;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     /* MAP DATA GENERATION FUNCTION
@@ -26,37 +34,117 @@ public class GrassyHills : MonoBehaviour
         {
             for (int y = 0; y < mapSizeY; y++)
             {
-                tileTypeMap[x, y, 0] = 0;
-                Vector3Int tileLocation = new Vector3Int(x, y, 0);
-                tileMapList.Add(tileLocation);
+                if (tileMapList.Contains(new Vector3Int(x, y, 0)))
+                {
+                    continue;
+                }
+
+                float rollTerrainChance = Random.Range(0.0f, 1.0f);
+                float rollElevationChance = Random.Range(0.0f, 1.0f);
+
+                if (rollTerrainChance <= 0.9f && x < mapSizeX - 2 && y < mapSizeY - 2)
+                {
+                    tileTypeMap[x, y, 0] = 0;
+                    tileMapList.Add(new Vector3Int(x, y, 0));
+
+                    if (rollElevationChance > 0.90f && x < mapSizeX - 2 && y < mapSizeY - 2)
+                    {
+                        tileTypeMap[x, y + 1, 1] = 0;
+                        tileTypeMap[x, y + 2, 1] = 0;
+                        tileTypeMap[x + 1, y + 1, 1] = 0;
+                        tileTypeMap[x + 1, y + 2, 1] = 0;
+
+                        tileMapList.Add(new Vector3Int(x, y + 1, 1));
+                        tileMapList.Add(new Vector3Int(x, y + 2, 1));
+                        tileMapList.Add(new Vector3Int(x + 1, y + 1, 1));
+                        tileMapList.Add(new Vector3Int(x + 1, y + 2, 1));
+
+                        float rollMountainChance = Random.Range(0.0f, 1.0f);
+                        if (rollMountainChance > 0.9f)
+                        {
+                            tileTypeMap[x, y + 2, 2] = 2;
+                            tileTypeMap[x + 1, y + 2, 2] = 2;
+
+                            tileMapList.Add(new Vector3Int(x, y + 2, 2));
+                            tileMapList.Add(new Vector3Int(x + 1, y + 2, 2));
+                        }
+                    }
+                }
+                else
+                {
+                    tileTypeMap[x, y, 0] = 0;
+                    tileMapList.Add(new Vector3Int(x, y, 0));
+                }
+                
+                if (x < mapSizeX - 2 && y < mapSizeY - 2)
+                {
+                    if (rollTerrainChance > 0.9f && rollTerrainChance < 1.0f)
+                    {
+                        tileTypeMap[x, y, 0] = 1;
+                        tileTypeMap[x + 1, y, 0] = 1;
+                        tileTypeMap[x, y + 1, 0] = 1;
+                        tileTypeMap[x + 1, y + 1, 0] = 1;
+
+                        tileMapList.Add(new Vector3Int(x, y, 0));
+                        tileMapList.Add(new Vector3Int(x + 1, y, 0));
+                        tileMapList.Add(new Vector3Int(x, y + 1, 0));
+                        tileMapList.Add(new Vector3Int(x + 1, y + 1, 0));
+                    }
+                }
             }
         }
+    }
+    
+    /* GENERATE PROP DATA
+     * This function is responsible for generating the random cover and props on the map
+     */
 
-        for (int x = 0; x < 3; x++)
-        {
-            for (int y = 3; y < 6; y++)
-            {
-                tileTypeMap[x, y, 0] = 1;
-            }
-        }
+    public void GeneratePropData(int mapSizeX, int mapSizeY, int mapSizeZ)
+    {
+        propTypeMap = new int[mapSizeX, mapSizeY, mapSizeZ];
+        propTypeList = new List<Vector3Int>();
+        propList = new List<Prop>();
 
-        for (int x = 3; x < 6; x++)
+        foreach (var item in tileMapList)
         {
-            for (int y = 3; y < 6; y++)
+            if (!tileMapList.Contains(new Vector3Int(item.x, item.y, item.z + 1))
+                && !propTypeList.Contains(new Vector3Int(item.x, item.y, item.z)))
             {
-                tileTypeMap[x, y, 1] = 0;
-                Vector3Int tileLocation = new Vector3Int(x, y, 1);
-                tileMapList.Add(tileLocation);
-            }
-        }
+                float propChance = Random.Range(0.0f, 1.0f);
 
-        for (int x = 6; x < 9; x++)
-        {
-            for (int y = 3; y < 6; y++)
-            {
-                tileTypeMap[x, y, 1] = 2;
-                Vector3Int tileLocation = new Vector3Int(x, y, 1);
-                tileMapList.Add(tileLocation);
+                if (propChance > 0.95f)
+                {
+                    float propTypeChance = Random.Range(0.0f, 1.0f);
+                    
+                    if (propTypeChance < 0.3)
+                    {
+                        propTypeMap[item.x, item.y, item.z] = 0;
+                        propTypeList.Add(new Vector3Int(item.x, item.y, item.z));
+                    }
+
+                    if (propTypeChance > 0.3 && propTypeChance < 0.8)
+                    {
+                        propTypeMap[item.x, item.y, item.z] = 1;
+                        propTypeList.Add(new Vector3Int(item.x, item.y, item.z));
+                    }
+
+                    if (propTypeChance > 0.8)
+                    {
+                        if (item.x < mapSizeX - 2
+                            && tileMapList.Contains(new Vector3Int(item.x + 1, item.y, item.z))
+                            && tileMapList.Contains(new Vector3Int(item.x + 2, item.y, item.z))
+                            && !tileMapList.Contains(new Vector3Int(item.x + 2, item.y, item.z + 1))
+                            && !tileMapList.Contains(new Vector3Int(item.x + 2, item.y, item.z + 1)))
+                        {
+                            propTypeMap[item.x, item.y, item.z] = 2;
+                            propTypeMap[item.x + 1, item.y, item.z] = 3;
+                            propTypeMap[item.x + 2, item.y, item.z] = 4;
+                            propTypeList.Add(new Vector3Int(item.x, item.y, item.z));
+                            propTypeList.Add(new Vector3Int(item.x + 1, item.y, item.z));
+                            propTypeList.Add(new Vector3Int(item.x + 2, item.y, item.z));
+                        }
+                    }
+                }
             }
         }
     }
@@ -69,17 +157,35 @@ public class GrassyHills : MonoBehaviour
         foreach (var item in tileMapList)
         {
             /// Instantiating the tiles after setting their type based on the map graph
-            TileSets.GrassyHills type = grassyHills[tileTypeMap[item.x, item.y, item.z]];
+            TileSets.GrassyHillTiles type = grassyHills[tileTypeMap[item.x, item.y, item.z]];
             GameObject tile = Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
-            tile.transform.parent = map.transform;
+            tile.transform.parent = tiles.transform;
 
             /// Setting clickable tiles based on type
             Tile clickableTile = tile.GetComponent<Tile>();
+            clickableTile.tileLocation = item;
             if (tileTypeMap[item.x, item.y, item.z] < 3)
             {
                 clickableTile.isClickable = true;
-                clickableTile.tileLocation = item;
             }
+        }
+
+        foreach (var item in propTypeList)
+        {
+            /// Instantiating the props after setting their type based on the prop graph
+            PropSets.GrassyHillProps type = grassyHillsProps[tileTypeMap[item.x, item.y, item.z]];
+            GameObject prop = Instantiate(type.propVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
+            prop.transform.parent = props.transform;
+
+            /// Setting props based on type
+            Prop propInfo = prop.GetComponent<Prop>();
+            
+            propInfo.location = item;
+            propInfo.isStructure = type.isStructure;
+            propInfo.blocksTile = type.blocksTile;
+            propInfo.coverType = type.coverType;
+
+            propList.Add(propInfo);
         }
     }
 
@@ -178,6 +284,14 @@ public class GrassyHills : MonoBehaviour
                     graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y + 1, index.z - 1]);
                     graph[index.x, index.y + 1, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
                 }
+            }
+        }
+
+        foreach (Prop prop in propList)
+        {
+            if (prop.blocksTile)
+            {
+                graph[prop.location.x, prop.location.y, prop.location.z].isWalkable = false;
             }
         }
 

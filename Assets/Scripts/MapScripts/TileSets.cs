@@ -4,13 +4,13 @@
 public class TileSets
 {
     [System.Serializable]
-    public class GrassyHills : TileType
+    public class GrassyHillTiles : TileType
     {
 
     }
 
     [System.Serializable]
-    public class DesertHills : TileType
+    public class DesertHillTiles : TileType
     {
 
     }

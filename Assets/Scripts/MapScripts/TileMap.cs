@@ -17,6 +17,7 @@ public class TileMap : MonoBehaviour
     public void GenerateGrassyHills(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
         grassyHills.GenerateMapData(mapSizeX, mapSizeY, mapSizeZ);
+        grassyHills.GeneratePropData(mapSizeX, mapSizeX, mapSizeZ);
         grassyHills.GenerateMapVisual();
         graph = grassyHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
     }

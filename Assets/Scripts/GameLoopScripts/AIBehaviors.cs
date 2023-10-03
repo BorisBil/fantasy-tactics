@@ -56,8 +56,6 @@ public class AIBehaviors : MonoBehaviour
                     toMoveQAI.RemoveAt(0);
                     toMoveToAI.RemoveAt(0);
 
-                    movedUnits.Add(unit);
-
                     if (unit.actionPoints >= unit.weapon.actionCost)
                     {
                         gameLoopController.ListEnemyAttackSelectable(unit);
@@ -67,6 +65,8 @@ public class AIBehaviors : MonoBehaviour
                             gameLoopController.CalculateAttack(unit, unit.attackableUnits[0]);
                         }
                     }
+
+                    movedUnits.Add(unit);
 
                     if (movedUnits.Count == unitManager.enemyUnits.Count)
                     {
@@ -99,10 +99,6 @@ public class AIBehaviors : MonoBehaviour
 
         foreach (Unit unit in unitManager.enemyUnits)
         {
-            Debug.Log(unit.name);
-            Debug.Log(unit.unitType);
-            Debug.Log(isAITurn);
-
             unit.actionPoints = 2;
 
             if (unit.unitType == "Fighter")
@@ -144,14 +140,9 @@ public class AIBehaviors : MonoBehaviour
         Node unitNode = tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z];
 
         gameLoopController.ListEnemyAttackSelectable(unit);
-        foreach (var item in unit.attackableUnits)
-        {
-            Debug.Log(item);
-        }
 
         if (unit.attackableUnits.Count > 0)
         {
-            Debug.Log("Enemy can attack");
             gameLoopController.CalculateAttack(unit, unit.attackableUnits[0]);
             movedUnits.Add(unit);
 
@@ -177,8 +168,6 @@ public class AIBehaviors : MonoBehaviour
                     closestTargetNode = playerUnitNode;
                 }
             }
-
-            Debug.Log(closestTargetNode.location);
 
             List<Node> finalMoveList = new List<Node>();
 
