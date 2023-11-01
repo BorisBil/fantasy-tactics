@@ -94,6 +94,14 @@ public class GameLoopController : MonoBehaviour
                     {
                         unit.attackableUnits.Add(enemy);
                     }
+
+                    if (Physics.Raycast(ray, out hitInfo, distance))
+                    {
+                        if (hitInfo.transform.parent == GameObject.Find("Prop"))
+                        {
+                            unit.attackableUnits.Add(enemy);
+                        }
+                    }
                 }
             }
         }

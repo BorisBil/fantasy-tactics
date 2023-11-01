@@ -9,6 +9,7 @@ public class Tile : MonoBehaviour
     public bool isClickable = false;
 
     public bool isRamp;
+    public bool hasProp;
     
     public TileMap map;
 }

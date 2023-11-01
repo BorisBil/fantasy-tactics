@@ -9,13 +9,12 @@ public class UnitManager : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public GameManager gameManager;
+    public ItemManager itemManager;
 
     public GameObject _unitManager;
 
     public List<Unit> playerUnits;
     public List<Unit> enemyUnits;
-
-    public EnemyUnitType[] enemyUnitType;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     /*
@@ -49,6 +48,8 @@ public class UnitManager : MonoBehaviour
         unit.isSelectable = true;
 
         playerUnits.Add(unit);
+
+        itemManager.GivePlayerItems(unit);
 
         return unit;
     }
@@ -85,6 +86,8 @@ public class UnitManager : MonoBehaviour
 
         enemyUnits.Add(unit);
 
+        itemManager.DetermineItems(unit);
+
         return unit;
     }
 
@@ -118,24 +121,5 @@ public class UnitManager : MonoBehaviour
         enemyUnits.Remove(unit);
 
         Destroy(unit.gameObject);
-    }
-
-    ///  Enemy unit type table
-    [System.Serializable]
-    public class EnemyUnitType
-    {
-        public string name;
-
-        public GameObject unitModel;
-
-        public List<Node> currentPath = null;
-
-        public string unitDescription;
-        public string unitType;
-
-        public int unitSpeed;
-        public int baseMovement;
-        public int baseHP;
-        public int unitTeam;
     }
 }

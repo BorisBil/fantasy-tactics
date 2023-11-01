@@ -7,7 +7,7 @@ public class Prop : MonoBehaviour
     public bool isStructure;
     public bool blocksTile;
 
-    public string coverType;
+    public float coverType;
 
     public TileMap map;
 }

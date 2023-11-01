@@ -8,5 +8,5 @@ public class PropType
     public bool isStructure;
     public bool blocksTile;
 
-    public string coverType;
+    public float coverType;
 }

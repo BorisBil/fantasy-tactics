@@ -28,6 +28,7 @@ public class Unit : MonoBehaviour
     public int armorHP;
     public int armorAP;
     public int attackRange;
+    public int visionRadius;
 
     public int unitTeam;
 
@@ -44,6 +45,8 @@ public class Unit : MonoBehaviour
     public List<Item> inventory;
 
     public List<Unit> attackableUnits;
+
+    public List<Unit> visibleUnits;
 
     public bool isMoving;
     public bool isSelectable;

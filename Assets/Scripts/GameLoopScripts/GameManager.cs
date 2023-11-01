@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// 
@@ -9,7 +10,8 @@ public class GameManager : MonoBehaviour
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public TileMap tileMap;
     public UnitManager unitManager;
-    public ItemDatabase itemDatabase;
+    public ItemManager itemManager;
+    public EnemyManager enemyManager;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     /// 
@@ -17,32 +19,16 @@ public class GameManager : MonoBehaviour
     /// 
     public void Start()
     {
-        itemDatabase = new ItemDatabase();
-
-        itemDatabase.GenerateWeaponsList();
-        itemDatabase.GenerateArmorList();
-        itemDatabase.ListItemDatabase();
+        enemyManager.CreateEnemyDatabases();
+        itemManager.CreateItemDatabase();
 
         tileMap.GenerateGrassyHills(10, 10, 5);
 
         Unit unit = unitManager.NewPlayerUnit(new Vector3Int(0, 0, 0));
-        unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Goblin Longsword"]);
-        unit.AddArmor((Item.Armor)itemDatabase.itemDatabase["Goblin Chest Armor"]);
-        unit.CalculateStats();
 
         unit = unitManager.NewPlayerUnit(new Vector3Int(2, 0, 0));
-        unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Goblin Longsword"]);
-        unit.AddArmor((Item.Armor)itemDatabase.itemDatabase["Goblin Chest Armor"]);
-        unit.CalculateStats();
 
-        int randomEnemies = (int)Mathf.Round(Random.Range(1.0f, 4.0f));
-
-        for (int i = 0; i < randomEnemies; i++)
-        {
-            unit = unitManager.SpawnEnemyUnit(unitManager.enemyUnitType[1], new Vector3Int(9 - i, 9, 0));
-            unit.AddWeapon((Item.Weapon)itemDatabase.itemDatabase["Zombie Fists"]);
-            unit.CalculateStats();
-        }
+        enemyManager.DetermineEnemies(2, "GrassyHills");
     }
 
     public void GameLost()

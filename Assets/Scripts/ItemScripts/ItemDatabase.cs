@@ -8,19 +8,24 @@ public class ItemDatabase
     public ItemDatabase()
     {
         itemDatabase = new Dictionary<string, Item>();
+
+        GenerateWeaponsList();
+        GenerateArmorList();
+
+        ListItemDatabase();
     }
 
-    public void addWeaponToDatabase(Item.Weapon weapon)
+    public void AddWeaponToDatabase(Item.Weapon weapon)
     {
         itemDatabase.Add(weapon.name, weapon);
     }
 
-    public void addArmorToDatabase(Item.Armor armor)
+    public void AddArmorToDatabase(Item.Armor armor)
     {
         itemDatabase.Add(armor.name, armor);
     }
 
-    public void GenerateWeaponsList()
+    public Dictionary<string, Item> GenerateWeaponsList()
     {
         Item.Weapon.Shortbow shortbow = ScriptableObject.CreateInstance<Item.Weapon.Shortbow>();
         Item.Weapon.Longbow longbow = ScriptableObject.CreateInstance<Item.Weapon.Longbow>();
@@ -50,7 +55,8 @@ public class ItemDatabase
         unarmed.weight = 0;
 
         unarmed.id = 1;
-        addWeaponToDatabase(unarmed);
+        
+        AddWeaponToDatabase(unarmed);
 
         /*
          * UNARMED
@@ -78,7 +84,8 @@ public class ItemDatabase
         longsword.weight = 2;
 
         longsword.id = 1;
-        addWeaponToDatabase(longsword);
+        
+        AddWeaponToDatabase(longsword);
 
         /// Shortsword
         shortsword.name = "Goblin Shortsword";
@@ -98,7 +105,8 @@ public class ItemDatabase
         shortsword.weight = 1;
 
         shortsword.id = 2;
-        addWeaponToDatabase(shortsword);
+        
+        AddWeaponToDatabase(shortsword);
 
         /// Crossbow
         crossbow.name = "Goblin Crossbow";
@@ -118,7 +126,8 @@ public class ItemDatabase
         crossbow.weight = 5;
 
         crossbow.id = 3;
-        addWeaponToDatabase(crossbow);
+        
+        AddWeaponToDatabase(crossbow);
 
         /// Longbow
         longbow.name = "Goblin Longbow";
@@ -138,11 +147,14 @@ public class ItemDatabase
         longbow.weight = 4;
 
         longbow.id = 4;
-        addWeaponToDatabase(longbow);
+        
+        AddWeaponToDatabase(longbow);
 
         /*
          * GOBLIN WEAPONS
          */
+
+        return itemDatabase;
     }
 
     public void GenerateArmorList()
@@ -171,7 +183,8 @@ public class ItemDatabase
         armor.weight = 5;
 
         armor.id = 1;
-        addArmorToDatabase(armor);
+        
+        AddArmorToDatabase(armor);
 
         /// Helmet
         helmet.name = "Goblin Helmet";
@@ -188,7 +201,8 @@ public class ItemDatabase
         helmet.weight = 5;
 
         helmet.id = 2;
-        addArmorToDatabase(helmet);
+        
+        AddArmorToDatabase(helmet);
         
         /// Boots
         boots.name = "Goblin Boots";
@@ -205,7 +219,8 @@ public class ItemDatabase
         boots.weight = 5;
 
         boots.id = 3;
-        addArmorToDatabase(boots);
+        
+        AddArmorToDatabase(boots);
         
         /// Legs
         chausses.name = "Goblin Chausses";
@@ -222,11 +237,17 @@ public class ItemDatabase
         chausses.weight = 5;
 
         chausses.id = 4;
-        addArmorToDatabase(chausses);
+        
+        AddArmorToDatabase(chausses);
         
         /* 
          * GOBLIN ARMOR SET
          */
+    }
+
+    public Dictionary<string, Item> ReturnItemDatabase()
+    {
+        return itemDatabase;
     }
 
     public void ListItemDatabase()

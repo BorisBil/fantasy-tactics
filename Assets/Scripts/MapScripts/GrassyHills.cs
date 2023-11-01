@@ -15,6 +15,7 @@ public class GrassyHills : MonoBehaviour
     private List<Vector3Int> tileMapList;
     private List<Vector3Int> graphNodeList;
     private List<Vector3Int> propTypeList;
+    
     private List<Prop> propList;
 
     public GameObject map;
@@ -102,6 +103,7 @@ public class GrassyHills : MonoBehaviour
     public void GeneratePropData(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
         propTypeMap = new int[mapSizeX, mapSizeY, mapSizeZ];
+        
         propTypeList = new List<Vector3Int>();
         propList = new List<Prop>();
 
@@ -164,9 +166,10 @@ public class GrassyHills : MonoBehaviour
             /// Setting clickable tiles based on type
             Tile clickableTile = tile.GetComponent<Tile>();
             clickableTile.tileLocation = item;
-            if (tileTypeMap[item.x, item.y, item.z] < 3)
+
+            if (propTypeList.Contains(new Vector3Int(item.x, item.y, item.z)))
             {
-                clickableTile.isClickable = true;
+                clickableTile.hasProp = true;
             }
         }
 
