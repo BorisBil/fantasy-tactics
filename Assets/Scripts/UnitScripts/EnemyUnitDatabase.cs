@@ -31,6 +31,7 @@ public class EnemyUnitDatabase
         zombie.unitSpeed = 3;
         zombie.baseMovement = 4;
         zombie.baseHP = 5;
+        zombie.visionRadius = 6;
         zombie.unitTeam = 2;
 
         zombie.unitModel = Resources.Load("Prefabs/Enemies/zombie") as GameObject;

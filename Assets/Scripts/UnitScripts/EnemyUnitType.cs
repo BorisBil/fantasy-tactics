@@ -13,4 +13,5 @@ public class EnemyUnitType : ScriptableObject
     public int baseMovement;
     public int baseHP;
     public int unitTeam;
+    public int visionRadius;
 }

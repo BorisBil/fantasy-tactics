@@ -201,6 +201,7 @@ MonoBehaviour:
   unitManager: {fileID: 1586870097}
   tileMap: {fileID: 161391764}
   gameLoopController: {fileID: 1898208015}
+  enemyManager: {fileID: 2078474869}
   movedUnits: []
   isAITurn: 0
 --- !u!1 &161391762

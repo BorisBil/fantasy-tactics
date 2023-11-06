@@ -36,6 +36,7 @@ public class UnitManager : MonoBehaviour
         unit.baseMovement = 5;
         unit.level = 1;
         unit.actionPoints = 2;
+        unit.visionRadius = 7;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedUnit;
@@ -73,6 +74,7 @@ public class UnitManager : MonoBehaviour
         unit.unitSpeed = unitType.unitSpeed;
         unit.baseMovement = unitType.baseMovement;
         unit.baseHP = unitType.baseHP;
+        unit.visionRadius = unitType.visionRadius;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedEnemy;

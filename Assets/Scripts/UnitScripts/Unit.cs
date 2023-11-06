@@ -16,6 +16,7 @@ public class Unit : MonoBehaviour
     
     public string unitDescription;
     public string unitType;
+    public string status;
 
     public float unitSpeed;
     public int baseMovement;

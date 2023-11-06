@@ -166,6 +166,7 @@ public class PlayerController : MonoBehaviour
                     toMoveQ.RemoveAt(0);
                     toMoveTo.RemoveAt(0);
 
+                    gameLoopController.ListPlayerVisibleUnits(unit);
                     gameLoopController.ListPlayerAttackSelectable(unit);
 
                     if (selectedUnit != null && selectedUnit.GetComponent<Unit>() == unit)
@@ -190,6 +191,7 @@ public class PlayerController : MonoBehaviour
                     {
                         unit.unitPosition = unit.currentPath[0].location;
                         unit.transform.position = unit.unitPosition;
+                        gameLoopController.ListPlayerVisibleUnits(unit);
                         unit.currentPath.RemoveAt(0);
                     }
                 }

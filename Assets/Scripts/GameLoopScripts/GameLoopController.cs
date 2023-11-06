@@ -49,7 +49,7 @@ public class GameLoopController : MonoBehaviour
 
         if (unit.actionPoints - unit.weapon.actionCost >= 0)
         {
-            foreach (Unit enemy in unitManager.enemyUnits)
+            foreach (Unit enemy in unit.visibleUnits)
             {
                 float distance = DistanceBetweenUnits(unit, enemy);
 
@@ -78,11 +78,11 @@ public class GameLoopController : MonoBehaviour
 
         if (unit.actionPoints - unit.weapon.actionCost >= 0)
         {
-            foreach (Unit enemy in unitManager.playerUnits)
+            foreach (Unit enemy in unit.visibleUnits)
             {
                 float distance = DistanceBetweenUnits(unit, enemy);
 
-                if (distance <= unit.attackRange)
+                if (distance <= unit.attackRange + 0.5f)
                 {
                     Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 0.50f);
                     Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 0.50f);
@@ -102,6 +102,54 @@ public class GameLoopController : MonoBehaviour
                             unit.attackableUnits.Add(enemy);
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public void ListPlayerVisibleUnits(Unit unit)
+    {
+        unit.visibleUnits.Clear();
+
+        foreach (Unit enemy in unitManager.enemyUnits)
+        {
+            float distance = DistanceBetweenUnits(unit, enemy);
+
+            if (distance <= unit.visionRadius)
+            {
+                Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 1.00f);
+                Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 1.00f);
+
+                Ray ray = new Ray(rayCastUnitCoords, rayCastEnemyCoords);
+                RaycastHit hitInfo;
+
+                if (!Physics.Raycast(ray, out hitInfo, distance) || (hitInfo.transform.parent == GameObject.Find("Prop")))
+                {
+                    unit.visibleUnits.Add(enemy);
+                }
+            }
+        }
+    }
+
+    public void ListEnemyVisibleUnits(Unit unit)
+    {
+        unit.visibleUnits.Clear();
+
+        foreach (Unit enemy in unitManager.playerUnits)
+        {
+            float distance = DistanceBetweenUnits(unit, enemy);
+
+            if (distance <= unit.visionRadius)
+            {
+                Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 0.50f);
+                Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 0.50f);
+
+                Ray ray = new Ray(rayCastUnitCoords, rayCastEnemyCoords);
+                RaycastHit hitInfo;
+
+                if (!Physics.Raycast(ray, out hitInfo, distance) || (hitInfo.transform.parent == GameObject.Find("Prop")))
+                {
+                    unit.visibleUnits.Add(enemy);
                 }
             }
         }
