@@ -95,7 +95,7 @@ public class TileMap : MonoBehaviour
         
         openList.Add(startNode);
         cost_so_far[startNode] = 0;
-        
+
         while (openList.Count > 0) 
         {
             Node currentNode = openList.OrderBy(node => node.F).First();

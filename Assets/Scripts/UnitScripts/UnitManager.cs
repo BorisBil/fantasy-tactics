@@ -10,6 +10,7 @@ public class UnitManager : MonoBehaviour
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public GameManager gameManager;
     public ItemManager itemManager;
+    public EnemyManager enemyManager;
 
     public GameObject _unitManager;
 
@@ -108,9 +109,9 @@ public class UnitManager : MonoBehaviour
 
     public void PlayerUnitDeath(Unit unit)
     {
-        playerUnits.Remove(unit);
-
         Destroy(unit.gameObject);
+
+        playerUnits.Remove(unit);
 
         if (playerUnits.Count == 0)
         {
@@ -120,8 +121,30 @@ public class UnitManager : MonoBehaviour
 
     public void EnemyUnitDeath(Unit unit)
     {
+        Destroy(unit.gameObject);
+        
         enemyUnits.Remove(unit);
 
-        Destroy(unit.gameObject);
+        foreach (SpawnedPod spawnedPod in enemyManager.spawnedPodList)
+        {
+            if (spawnedPod.unitsInPod.Contains(unit))
+            {
+                spawnedPod.unitsInPod.Remove(unit);
+
+                if (spawnedPod.unitsInPod.Count == 0)
+                {
+                    enemyManager.spawnedPodList.Remove(spawnedPod);
+
+                    if (enemyManager.awakePods.Contains(spawnedPod))
+                    {
+                        enemyManager.awakePods.Remove(spawnedPod);
+                    }
+                    if (enemyManager.asleepPods.Contains(spawnedPod))
+                    {
+                        enemyManager.asleepPods.Remove(spawnedPod);
+                    }
+                }
+            }
+        }
     }
 }

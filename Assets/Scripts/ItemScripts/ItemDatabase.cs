@@ -11,8 +11,6 @@ public class ItemDatabase
 
         GenerateWeaponsList();
         GenerateArmorList();
-
-        ListItemDatabase();
     }
 
     public void AddWeaponToDatabase(Item.Weapon weapon)

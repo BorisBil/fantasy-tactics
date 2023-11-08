@@ -1263,6 +1263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 1883348083}
   itemManager: {fileID: 1937934915}
+  enemyManager: {fileID: 2078474869}
   _unitManager: {fileID: 1586870095}
   playerUnits: []
   enemyUnits: []

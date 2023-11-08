@@ -10,6 +10,8 @@ public class EnemyManager : MonoBehaviour
 
     public List<EnemyPod> enemyPodList;
     public List<SpawnedPod> spawnedPodList;
+    public List<SpawnedPod> awakePods;
+    public List<SpawnedPod> asleepPods;
 
     public void CreateEnemyDatabases()
     {
@@ -18,6 +20,10 @@ public class EnemyManager : MonoBehaviour
         enemyPodDatabase = new EnemyPodDatabase();
 
         spawnedPodList = new List<SpawnedPod>();
+
+        awakePods = new List<SpawnedPod>();
+
+        asleepPods = new List<SpawnedPod>();
     }
 
     public void DetermineEnemies(int difficulty, string environment)
@@ -59,6 +65,22 @@ public class EnemyManager : MonoBehaviour
             }
 
             spawnedPodList.Add(spawnedPod);
+
+            if (spawnedPod.status == "Awake")
+            {
+                awakePods.Add(spawnedPod);
+            }
+            if (spawnedPod.status == "Asleep")
+            {
+                asleepPods.Add(spawnedPod);
+            }
+        }
+
+        for (int i = 0; i < unitManager.enemyUnits.Count; i++)
+        {
+            Unit unit = unitManager.enemyUnits[i];
+
+            unit.id = i;
         }
     }
 }

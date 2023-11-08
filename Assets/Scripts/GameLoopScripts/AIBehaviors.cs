@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ public class AIBehaviors : MonoBehaviour
             {
                 isMovingAI = true;
             }
-            
+
             if (toMoveQAI.Count == 0)
             {
                 isMovingAI = false;
@@ -69,19 +70,13 @@ public class AIBehaviors : MonoBehaviour
                             }
                         }
                     }
-                    
+
                     if (unit.status == "Awoken")
                     {
                         unit.status = "Awake";
                     }
 
                     movedUnits.Add(unit);
-
-                    if (movedUnits.Count == unitManager.enemyUnits.Count)
-                    {
-                        isMovingAI = false;
-                        gameLoopController.StartPlayerTurn();
-                    }
                 }
 
                 if (unit.currentPath != null)
@@ -101,6 +96,10 @@ public class AIBehaviors : MonoBehaviour
             if (movedUnits.Count == unitManager.enemyUnits.Count)
             {
                 isMovingAI = false;
+                foreach (Unit unit in movedUnits)
+                {
+                    Debug.Log(unit.id);
+                }
                 gameLoopController.StartPlayerTurn();
             }
         }
@@ -110,49 +109,40 @@ public class AIBehaviors : MonoBehaviour
     {
         movedUnits.Clear();
 
-        isAITurn = true;  
+        isAITurn = true;
 
-        foreach (SpawnedPod spawnedPod in enemyManager.spawnedPodList)
+        foreach (SpawnedPod asleepPod in enemyManager.asleepPods)
         {
-            if (spawnedPod.status == "Awake")
+            foreach (Unit unit in asleepPod.unitsInPod)
             {
-                foreach (Unit unit in spawnedPod.unitsInPod)
+                gameLoopController.ListEnemyVisibleUnits(unit);
+
+                if (unit.visibleUnits.Count > 0)
                 {
-                    unit.actionPoints = 2;
-                    
-                    if (unit.unitType == "Fighter")
-                    {
-                        FighterBehavior(unit);
-                    }
-
-                    if (unit.unitType == "Archer")
-                    {
-                        ArcherBehavior(unit);
-                    }
-
-                    if (unit.unitType == "Zombie")
-                    {
-                        ZombieBehavior(unit);
-                    }
+                    asleepPod.status = "Awoken";
                 }
-                
             }
-            
-            if (spawnedPod.status == "Asleep")
+        }
+
+        foreach (SpawnedPod awakePod in enemyManager.awakePods)
+        {
+            foreach (Unit unit in awakePod.unitsInPod)
             {
-                foreach (Unit unit in spawnedPod.unitsInPod)
+                unit.actionPoints = 2;
+
+                if (unit.unitType == "Fighter")
                 {
-                    gameLoopController.ListEnemyVisibleUnits(unit);
+                    FighterBehavior(unit);
+                }
 
-                    if (unit.visibleUnits.Count > 0)
-                    {
-                        spawnedPod.status = "Awoken";
-                    }
+                if (unit.unitType == "Archer")
+                {
+                    ArcherBehavior(unit);
+                }
 
-                    else
-                    {
-                        movedUnits.Add(unit);
-                    }
+                if (unit.unitType == "Zombie")
+                {
+                    ZombieBehavior(unit);
                 }
             }
         }
@@ -161,6 +151,9 @@ public class AIBehaviors : MonoBehaviour
         {
             if (spawnedPod.status == "Awoken")
             {
+                enemyManager.asleepPods.Remove(spawnedPod);
+                enemyManager.awakePods.Add(spawnedPod);
+
                 foreach (Unit unit in spawnedPod.unitsInPod)
                 {
                     if (unit.unitType == "Zombie")
@@ -170,6 +163,14 @@ public class AIBehaviors : MonoBehaviour
                 }
 
                 spawnedPod.status = "Awake";
+            }
+        }
+
+        foreach (SpawnedPod asleepPod in enemyManager.asleepPods)
+        {
+            foreach (Unit unit in asleepPod.unitsInPod)
+            {
+                movedUnits.Add(unit);
             }
         }
     }
@@ -186,166 +187,213 @@ public class AIBehaviors : MonoBehaviour
 
     public void ZombieBehavior(Unit unit)
     {
-        List<Node> movementRange = tileMap.TileRange(unit);
-        
-        Node closestTargetNode = null;
-        Node finalTargetNode = null;
-
-        List<Node> checkList = new List<Node>();
-
-        Node unitNode = tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z];
-
         gameLoopController.ListEnemyAttackSelectable(unit);
 
         if (unit.attackableUnits.Count > 0)
         {
             gameLoopController.CalculateAttack(unit, unit.attackableUnits[0]);
-            movedUnits.Add(unit);
 
-            if (movedUnits.Count == unitManager.enemyUnits.Count)
-            {
-                isMovingAI = false;
-                gameLoopController.StartPlayerTurn();
-            }
+            movedUnits.Add(unit);
         }
         else
         {
-            List<Node> targetMoveList = new List<Node>();
-            
-            foreach (Unit playerunit in unitManager.playerUnits)
+            List<List<Node>> generatedPaths = new List<List<Node>>();
+            List<Node> inRangeTiles = tileMap.TileRange(unit);
+
+            List<Node> finalPath = new List<Node>();
+            Node finalNode = null;
+
+            foreach (Unit enemy in unitManager.playerUnits)
             {
-                Node playerUnitNode = tileMap.graph[(int)playerunit.unitPosition.x, (int)playerunit.unitPosition.y, (int)playerunit.unitPosition.z];
+                Vector3Int enemyPosition = new Vector3Int((int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z);
+                tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = true;
 
-                checkList = tileMap.GeneratePathTo(playerUnitNode.location, unitNode.location);
+                List<Node> path = tileMap.GeneratePathTo(enemyPosition, unit.unitPosition);
 
-                if (checkList.Count < targetMoveList.Count || targetMoveList.Count == 0)
-                {
-                    targetMoveList = checkList;
-                    closestTargetNode = playerUnitNode;
-                }
+                generatedPaths.Add(path);
+                tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = false;
             }
 
-            List<Node> finalMoveList = new List<Node>();
+            generatedPaths.Sort((a, b) => a.Count - b.Count);
 
-            foreach (Node neighbor in closestTargetNode.neighbors)
+            List<Node> closestTarget = generatedPaths[0];
+            Node targetNode = closestTarget[closestTarget.Count - 1];
+
+            generatedPaths.Clear();
+
+            foreach (Node neighbor in targetNode.neighbors)
             {
                 if (neighbor.isWalkable)
                 {
-                    if (movementRange.Contains(neighbor))
+                    if (inRangeTiles.Contains(neighbor))
                     {
-                        finalTargetNode = neighbor;
-                        finalMoveList = tileMap.GeneratePathTo(finalTargetNode.location, unitNode.location);
+                        finalPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
+                        finalNode = neighbor;
 
                         break;
                     }
-                    else
-                    {
-                        checkList = tileMap.GeneratePathTo(neighbor.location, unitNode.location);
+                }
+            }
 
-                        if (checkList.Count < finalMoveList.Count || finalMoveList.Count == 0)
+            if (finalPath.Count == 0)
+            {
+                foreach (Node neighbor in targetNode.neighbors)
+                {
+                    if (neighbor.isWalkable)
+                    {
+                        List<Node> checkPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
+
+                        generatedPaths.Add(checkPath);
+                    }
+                }
+
+                if (generatedPaths.Count == 0)
+                {
+                    foreach (Unit enemy in unitManager.playerUnits)
+                    {
+                        foreach (Node neighbor in tileMap.graph[(int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z].neighbors)
                         {
-                            finalTargetNode = neighbor;
-                            finalMoveList = checkList;
+                            if (neighbor.isWalkable)
+                            {
+                                finalPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
+                                finalNode = finalPath[finalPath.Count - 1];
+                            }
                         }
                     }
                 }
-            }
-
-            checkList.Clear();
-
-            if (finalMoveList.Count > unit.movementRange)
-            {
-                for (int i = 0; i < unit.movementRange; i++)
+                else
                 {
-                    checkList.Add(finalMoveList[i]);
-                }
+                    generatedPaths.Sort((a, b) => a.Count - b.Count);
 
-                finalMoveList = checkList;
+                    List<Node> closestPath = generatedPaths[0];
+
+                    for (int i = 0; i < unit.movementRange; i++)
+                    {
+                        finalPath.Add(closestPath[i]);
+                    }
+
+                    finalNode = finalPath[finalPath.Count - 1];
+                }
             }
-            finalTargetNode = finalMoveList[finalMoveList.Count - 1];
 
             toMoveQAI.Add(unit);
-            toMoveToAI.Add(finalTargetNode);
+            toMoveToAI.Add(finalNode);
 
-            unit.currentPath = finalMoveList;
+            unit.currentPath = finalPath;
 
-            tileMap.graph[finalTargetNode.location.x, finalTargetNode.location.y, finalTargetNode.location.z].isWalkable = false;
+            tileMap.graph[finalNode.location.x, finalNode.location.y, finalNode.location.z].isWalkable = false;
             tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
         }
     }
 
     public void ZombieAwoken(Unit unit)
     {
-        List<Node> movementRange = tileMap.TileRange(unit);
+        List<List<Node>> generatedPaths = new List<List<Node>>();
+        List<Node> inRangeTiles = tileMap.TileRange(unit);
 
-        Node closestTargetNode = null;
-        Node finalTargetNode = null;
+        List<Node> finalPath = new List<Node>();
+        Node finalNode = null;
 
-        List<Node> checkList = new List<Node>();
-
-        Node unitNode = tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z];
-        List<Node> targetMoveList = new List<Node>();
-
-        foreach (Unit playerunit in unitManager.playerUnits)
+        foreach (Unit enemy in unitManager.playerUnits)
         {
-            Node playerUnitNode = tileMap.graph[(int)playerunit.unitPosition.x, (int)playerunit.unitPosition.y, (int)playerunit.unitPosition.z];
+            Vector3Int enemyPosition = new Vector3Int((int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z);
+            tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = true;
 
-            checkList = tileMap.GeneratePathTo(playerUnitNode.location, unitNode.location);
+            List<Node> path = tileMap.GeneratePathTo(enemyPosition, unit.unitPosition);
 
-            if (checkList.Count < targetMoveList.Count || targetMoveList.Count == 0)
-            {
-                targetMoveList = checkList;
-                closestTargetNode = playerUnitNode;
-            }
+            generatedPaths.Add(path);
+            tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = false;
         }
 
-        List<Node> finalMoveList = new List<Node>();
+        generatedPaths.Sort((a, b) => a.Count - b.Count);
 
-        foreach (Node neighbor in closestTargetNode.neighbors)
+        List<Node> closestTarget = generatedPaths[0];
+        Node targetNode = closestTarget[closestTarget.Count - 1];
+
+        generatedPaths.Clear();
+
+        foreach (Node neighbor in targetNode.neighbors)
         {
             if (neighbor.isWalkable)
             {
-                if (movementRange.Contains(neighbor))
+                if (inRangeTiles.Contains(neighbor))
                 {
-                    finalTargetNode = neighbor;
-                    finalMoveList = tileMap.GeneratePathTo(finalTargetNode.location, unitNode.location);
+                    finalPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
+                    finalNode = neighbor;
 
                     break;
                 }
-                else
-                {
-                    checkList = tileMap.GeneratePathTo(neighbor.location, unitNode.location);
+            }
+        }
 
-                    if (checkList.Count < finalMoveList.Count || finalMoveList.Count == 0)
+        if (finalPath.Count == 0)
+        {
+            foreach (Node neighbor in targetNode.neighbors)
+            {
+                if (neighbor.isWalkable)
+                {
+                    List<Node> checkPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
+
+                    generatedPaths.Add(checkPath);
+                }
+            }
+
+            if (generatedPaths.Count == 0)
+            {
+                foreach (Unit enemy in unitManager.playerUnits)
+                {
+                    foreach (Node neighbor in tileMap.graph[(int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z].neighbors)
                     {
-                        finalTargetNode = neighbor;
-                        finalMoveList = checkList;
+                        if (neighbor.isWalkable)
+                        {
+                            finalPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
+                            finalNode = finalPath[finalPath.Count - 1];
+                        }
                     }
                 }
             }
-        }
-
-        checkList.Clear();
-
-        if (finalMoveList.Count > unit.movementRange)
-        {
-            for (int i = 0; i < unit.movementRange; i++)
+            else
             {
-                checkList.Add(finalMoveList[i]);
-            }
+                generatedPaths.Sort((a, b) => a.Count - b.Count);
 
-            finalMoveList = checkList;
+                List<Node> closestPath = generatedPaths[0];
+
+                for (int i = 0; i < unit.movementRange; i++)
+                {
+                    finalPath.Add(closestPath[i]);
+                }
+
+                finalNode = finalPath[finalPath.Count - 1];
+            }
         }
-        finalTargetNode = finalMoveList[finalMoveList.Count - 1];
+
+        Debug.Log(unit.id);
+        Debug.Log(finalNode.location);
+        foreach (Node node in finalPath)
+        {
+            Debug.Log(node.location);
+        }
 
         toMoveQAI.Add(unit);
-        toMoveToAI.Add(finalTargetNode);
+        toMoveToAI.Add(finalNode);
 
-        unit.currentPath = finalMoveList;
+        foreach(Node node in toMoveToAI)
+        {
+            Debug.Log(node.location);
+        }
 
-        tileMap.graph[finalTargetNode.location.x, finalTargetNode.location.y, finalTargetNode.location.z].isWalkable = false;
+        foreach (Unit test in toMoveQAI)
+        {
+            Debug.Log(test.id);
+        }
+
+        unit.currentPath = finalPath;
+
+        tileMap.graph[finalNode.location.x, finalNode.location.y, finalNode.location.z].isWalkable = false;
         tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
 
         unit.status = "Awoken";
     }
+
+    /// TO FIX: FOR SOME REASON SAME UNIT GETS ADDED MULTIPLE TIMES
 }

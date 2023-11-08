@@ -16,23 +16,16 @@ public class EnemyPodDatabase
         enemyUnitDatabase = new EnemyUnitDatabase();
 
         GeneratePodList();
-        ListItemDatabase();
     }
 
     public void GeneratePodList()
     {
         enemyUnitTypes = enemyUnitDatabase.GenerateEnemyUnitDatabase();
-        enemyUnitDatabase.ListItemDatabase();
 
         EnemyPod newPod = new EnemyPod();
 
         newPod.name = "ZombiePod";
         newPod.status = "Asleep";
-
-        foreach (KeyValuePair<string, EnemyUnitType> kvp in enemyUnitTypes)
-        {
-            Debug.Log(kvp);
-        }
 
         newPod.unitsInPod.Add(enemyUnitTypes["Zombie"]);
         newPod.unitsInPod.Add(enemyUnitTypes["Zombie"]);

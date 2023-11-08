@@ -82,7 +82,7 @@ public class GameLoopController : MonoBehaviour
             {
                 float distance = DistanceBetweenUnits(unit, enemy);
 
-                if (distance <= unit.attackRange + 0.5f)
+                if (distance <= unit.attackRange + 0.75f)
                 {
                     Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 0.50f);
                     Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 0.50f);
@@ -97,7 +97,7 @@ public class GameLoopController : MonoBehaviour
 
                     if (Physics.Raycast(ray, out hitInfo, distance))
                     {
-                        if (hitInfo.transform.parent == GameObject.Find("Prop"))
+                        if (hitInfo.transform.parent == GameObject.Find("Prop") || hitInfo.transform.parent == GameObject.Find("PlayerUnits"))
                         {
                             unit.attackableUnits.Add(enemy);
                         }

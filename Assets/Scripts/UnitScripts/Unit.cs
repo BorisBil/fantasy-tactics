@@ -8,6 +8,7 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     public new string name;
+    public int id;
 
     public GameObject unitModel;
     public GameObject unitObject;
