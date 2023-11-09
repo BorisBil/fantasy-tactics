@@ -1,7 +1,9 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.EditorTools;
 using UnityEngine;
+
+/// 
+/// THIS GENERATES THE DATA AND SPAWNS IN THE MAP FOR THE GRASSYHILLS ENVIRONMENT
+///
 
 public class GrassyHills : MonoBehaviour
 {

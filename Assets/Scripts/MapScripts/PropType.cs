@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// 
+/// PROP TYPE SPECIFIER FOR TILESETS
+/// 
+
 public class PropType
 {
     public string name;

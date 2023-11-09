@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// 
 /// THIS FILE HOLDS ALL THE FUNCTIONS TO SPAWN AND DESPAWN UNITS
 /// 
+
 public class UnitManager : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
@@ -94,6 +94,7 @@ public class UnitManager : MonoBehaviour
         return unit;
     }
 
+    /// Checking the type of the unit that died
     public void UnitDeath(Unit unit)
     {
         if (unit.unitTeam == 1)
@@ -107,6 +108,7 @@ public class UnitManager : MonoBehaviour
         }
     }
 
+    /// Player unit death
     public void PlayerUnitDeath(Unit unit)
     {
         Destroy(unit.gameObject);
@@ -119,6 +121,7 @@ public class UnitManager : MonoBehaviour
         }
     }
 
+    /// Enemy unit death
     public void EnemyUnitDeath(Unit unit)
     {
         Destroy(unit.gameObject);

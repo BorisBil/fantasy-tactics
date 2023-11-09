@@ -5,6 +5,7 @@ using UnityEngine;
 /// 
 /// MAP GENERATOR ALONG WITH PATHFINDING
 /// 
+
 public class TileMap : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS

@@ -75,15 +75,18 @@ public class GameLoopController : MonoBehaviour
         /// Want to modify this later to only select targets in vision range
         /// 
         unit.attackableUnits.Clear();
+        Debug.Log(unit.id);
 
         if (unit.actionPoints - unit.weapon.actionCost >= 0)
         {
             foreach (Unit enemy in unit.visibleUnits)
             {
+                Debug.Log(enemy.unitPosition);
                 float distance = DistanceBetweenUnits(unit, enemy);
 
                 if (distance <= unit.attackRange + 0.75f)
                 {
+                    Debug.Log(distance);
                     Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 0.50f);
                     Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 0.50f);
 
@@ -97,6 +100,7 @@ public class GameLoopController : MonoBehaviour
 
                     if (Physics.Raycast(ray, out hitInfo, distance))
                     {
+                        Debug.Log(hitInfo.transform);
                         if (hitInfo.transform.parent == GameObject.Find("Prop") || hitInfo.transform.parent == GameObject.Find("PlayerUnits"))
                         {
                             unit.attackableUnits.Add(enemy);
@@ -141,8 +145,8 @@ public class GameLoopController : MonoBehaviour
 
             if (distance <= unit.visionRadius)
             {
-                Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 0.50f);
-                Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 0.50f);
+                Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z +1f);
+                Vector3 rayCastEnemyCoords = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z + 1f);
 
                 Ray ray = new Ray(rayCastUnitCoords, rayCastEnemyCoords);
                 RaycastHit hitInfo;

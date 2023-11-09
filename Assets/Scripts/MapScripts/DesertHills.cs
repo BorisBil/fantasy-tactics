@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// 
+/// THIS GENERATES THE DATA AND SPAWNS IN THE MAP FOR THE DESERT HILLS ENVIRONMENT
+///
+
 public class DesertHills : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS

@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// 
+/// THIS CLASS HOLDS THE INFORMATION ON A TYPE OF ENEMY UNIT
+/// 
+
 public class EnemyUnitType : ScriptableObject
 {   
     public new string name;

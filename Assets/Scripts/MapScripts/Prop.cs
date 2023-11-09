@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// 
+/// THIS FILE HOLDS THE PROP CLASS FOR PROP OBJECTS
+/// 
+
 public class Prop : MonoBehaviour
 {
     public Vector3Int location;

@@ -1,10 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// 
+/// THIS IS THE ITEM DATABASE, GETS GENERATED AT RUNTIME
+/// ITEMS OF ALL TYPES ARE STORED IN THE SAME DICTIONARY FOR CONVENIENCE
+/// 
+
 public class ItemDatabase
 {
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public Dictionary<string, Item> itemDatabase;
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
+    /// Constructor
     public ItemDatabase()
     {
         itemDatabase = new Dictionary<string, Item>();
@@ -13,16 +21,19 @@ public class ItemDatabase
         GenerateArmorList();
     }
 
+    /// Add the weapon
     public void AddWeaponToDatabase(Item.Weapon weapon)
     {
         itemDatabase.Add(weapon.name, weapon);
     }
 
+    /// Add the armor
     public void AddArmorToDatabase(Item.Armor armor)
     {
         itemDatabase.Add(armor.name, armor);
     }
 
+    /// Generate a list of weapons
     public Dictionary<string, Item> GenerateWeaponsList()
     {
         Item.Weapon.Shortbow shortbow = ScriptableObject.CreateInstance<Item.Weapon.Shortbow>();
@@ -155,6 +166,7 @@ public class ItemDatabase
         return itemDatabase;
     }
 
+    /// Generate a list of armor
     public void GenerateArmorList()
     {
         Item.Armor.Helmet helmet = ScriptableObject.CreateInstance<Item.Armor.Helmet>();
@@ -243,11 +255,13 @@ public class ItemDatabase
          */
     }
 
+    /// Returns the full database
     public Dictionary<string, Item> ReturnItemDatabase()
     {
         return itemDatabase;
     }
 
+    /// Lists out the contents of the database
     public void ListItemDatabase()
     {
         foreach (KeyValuePair<string, Item> kvp in itemDatabase)

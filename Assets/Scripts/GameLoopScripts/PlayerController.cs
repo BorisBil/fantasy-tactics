@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Net;
 using UnityEngine;
 
 /// 
 /// PLAYER'S VIEW OF THE GAME
 /// 
+
 public class PlayerController : MonoBehaviour
 {
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
@@ -32,6 +32,9 @@ public class PlayerController : MonoBehaviour
     public bool transitionTurn;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
+    ///
+    /// Set move mode on start, also create move queue
+    /// 
     private void Start()
     {
         toMoveQ = new List<Unit>();

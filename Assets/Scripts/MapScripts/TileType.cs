@@ -3,6 +3,7 @@ using UnityEngine;
 /// 
 /// TILETYPE INFORMATION SPECIFIER
 /// 
+
 public class TileType
 {
     public string name;

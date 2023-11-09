@@ -1,11 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+
+/// 
+/// DETERMINES THE BEHAVIORS OF THE AI, AND SETS UP THE AI'S TURN MUCH LIKE THE PLAYER'S VIEW
+/// 
 
 public class AIBehaviors : MonoBehaviour
 {
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
     public UnitManager unitManager;
     public TileMap tileMap;
     public GameLoopController gameLoopController;
@@ -21,6 +23,7 @@ public class AIBehaviors : MonoBehaviour
 
     private bool isMovingAI;
     public bool isAITurn;
+    // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     private void Start()
     {
@@ -96,15 +99,14 @@ public class AIBehaviors : MonoBehaviour
             if (movedUnits.Count == unitManager.enemyUnits.Count)
             {
                 isMovingAI = false;
-                foreach (Unit unit in movedUnits)
-                {
-                    Debug.Log(unit.id);
-                }
                 gameLoopController.StartPlayerTurn();
             }
         }
     }
 
+    /*
+     * AI turn setup, determines if pods see player units, determining if they stay asleep or wake up
+     */
     public void AITurn()
     {
         movedUnits.Clear();
@@ -175,6 +177,9 @@ public class AIBehaviors : MonoBehaviour
         }
     }
 
+    /*
+     * ENEMY UNITS BEHAVIOR
+     */
     public void FighterBehavior(Unit unit)
     {
         List<Node> movementRange = tileMap.TileRange(unit);
@@ -194,6 +199,7 @@ public class AIBehaviors : MonoBehaviour
             gameLoopController.CalculateAttack(unit, unit.attackableUnits[0]);
 
             movedUnits.Add(unit);
+            unit.actionPoints = 0;
         }
         else
         {
@@ -286,6 +292,9 @@ public class AIBehaviors : MonoBehaviour
         }
     }
 
+    /*
+     * ENEMY UNITS AWAKENING
+     */
     public void ZombieAwoken(Unit unit)
     {
         List<List<Node>> generatedPaths = new List<List<Node>>();
@@ -367,25 +376,8 @@ public class AIBehaviors : MonoBehaviour
             }
         }
 
-        Debug.Log(unit.id);
-        Debug.Log(finalNode.location);
-        foreach (Node node in finalPath)
-        {
-            Debug.Log(node.location);
-        }
-
         toMoveQAI.Add(unit);
         toMoveToAI.Add(finalNode);
-
-        foreach(Node node in toMoveToAI)
-        {
-            Debug.Log(node.location);
-        }
-
-        foreach (Unit test in toMoveQAI)
-        {
-            Debug.Log(test.id);
-        }
 
         unit.currentPath = finalPath;
 
@@ -394,6 +386,4 @@ public class AIBehaviors : MonoBehaviour
 
         unit.status = "Awoken";
     }
-
-    /// TO FIX: FOR SOME REASON SAME UNIT GETS ADDED MULTIPLE TIMES
 }
