@@ -187,4 +187,9 @@ public class DesertHills : MonoBehaviour
 
         return graph;
     }
+
+    public List<Vector3Int> ReturnGraphList()
+    {
+        return graphNodeList;
+    }
 }

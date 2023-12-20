@@ -14,15 +14,20 @@ public class GrassyHills : MonoBehaviour
     private int[,,] tileTypeMap;
     private int[,,] propTypeMap;
 
+    private TileLight[,,] lightGraph;
+    private Node[,,] graph;
+
     private List<Vector3Int> tileMapList;
     private List<Vector3Int> graphNodeList;
     private List<Vector3Int> propTypeList;
     
     private List<Prop> propList;
+    private List<Node> walkableNodes;
 
     public GameObject map;
     public GameObject tiles;
     public GameObject props;
+    public GameObject tilelights;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     /* MAP DATA GENERATION FUNCTION
@@ -199,8 +204,6 @@ public class GrassyHills : MonoBehaviour
      */
     public Node[,,] GenerateMapGraph(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
-        Node[,,] graph;
-
         graph = new Node[mapSizeX, mapSizeY, mapSizeZ];
         graphNodeList = new List<Vector3Int>();
 
@@ -300,6 +303,71 @@ public class GrassyHills : MonoBehaviour
             }
         }
 
+        GetWalkableNodes();
+
         return graph;
+    }
+
+    public void GetWalkableNodes()
+    {
+        walkableNodes = new List<Node>();
+
+        foreach (Vector3Int node in graphNodeList)
+        {
+            if (graph[node.x, node.y, node.z].isWalkable)
+            {
+                walkableNodes.Add(graph[node.x, node.y, node.z]);
+            }
+        }
+    }
+
+    public List<TileLight> GenerateMapLighting(int mapSizeX, int mapSizeY, int mapSizeZ)
+    {
+        lightGraph = new TileLight[mapSizeX, mapSizeY, mapSizeZ + 5];
+
+        List<TileLight> tileLights = new List<TileLight>();
+
+        foreach (Node node in walkableNodes)
+        {
+            Vector3Int spawnAt = new Vector3Int(node.location.x, node.location.y, node.location.z + 3);
+            GameObject activeTileLight = Resources.Load("Prefabs/Lights/TileLight") as GameObject;
+            GameObject spawnedLight = Instantiate(activeTileLight, spawnAt, Quaternion.identity);
+
+            spawnedLight.transform.Rotate(0, 180, 0);
+            spawnedLight.transform.parent = tilelights.transform;
+
+            TileLight tileLight = spawnedLight.GetComponent<TileLight>();
+            tileLight.location = spawnAt;
+            tileLight.enabledstatus = false;
+            tileLight.lightobject = spawnedLight;
+
+            lightGraph[spawnAt.x, spawnAt.y, spawnAt.z] = tileLight;
+            tileLights.Add(tileLight);
+        }
+
+        foreach (TileLight tileLight in tileLights)
+        {
+            if (!tileLight.enabledstatus)
+            {
+                tileLight.lightobject.SetActive(false);
+            }
+        }
+
+        return tileLights;
+    }
+
+    public TileLight[,,] ReturnLightGraph()
+    {
+        return lightGraph;
+    }
+
+    public List<Vector3Int> ReturnGraphList()
+    {
+        return graphNodeList;
+    }
+
+    public List<Node> ReturnWalkableNodeList()
+    {
+        return walkableNodes;
     }
 }

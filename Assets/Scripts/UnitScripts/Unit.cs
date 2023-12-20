@@ -51,6 +51,7 @@ public class Unit : MonoBehaviour
     public List<Unit> attackableUnits;
 
     public List<Unit> visibleUnits;
+    public List<Node> visibleTiles;
 
     public bool isMoving;
     public bool isSelectable;

@@ -12,7 +12,15 @@ public class TileMap : MonoBehaviour
     public GrassyHills grassyHills;
     public DesertHills desertHills;
 
+    public VisionManager visionManager;
+
     public Node[,,] graph;
+    public TileLight[,,] lightsGraph;
+    
+    public List<TileLight> lights;
+    
+    public List<Vector3Int> graphNodeList;
+    public List<Node> walkableNodes;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     public void GenerateGrassyHills(int mapSizeX, int mapSizeY, int mapSizeZ)
@@ -20,14 +28,20 @@ public class TileMap : MonoBehaviour
         grassyHills.GenerateMapData(mapSizeX, mapSizeY, mapSizeZ);
         grassyHills.GeneratePropData(mapSizeX, mapSizeX, mapSizeZ);
         grassyHills.GenerateMapVisual();
+        
         graph = grassyHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
+        lights = grassyHills.GenerateMapLighting(mapSizeX, mapSizeY, mapSizeZ);
+        walkableNodes = grassyHills.ReturnWalkableNodeList();
+        lightsGraph = grassyHills.ReturnLightGraph();
     }
 
     public void GenerateDesertHills(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
         desertHills.GenerateMapData(mapSizeX, mapSizeY, mapSizeZ);
         desertHills.GenerateMapVisual();
+        
         graph = desertHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
+        graphNodeList = desertHills.ReturnGraphList();
     }
 
     /* MOVEMENT RANGE

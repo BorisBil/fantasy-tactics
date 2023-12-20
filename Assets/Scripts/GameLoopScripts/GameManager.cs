@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public UnitManager unitManager;
     public ItemManager itemManager;
     public EnemyManager enemyManager;
+    public GameLoopController gameLoopController;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
     /// 
@@ -28,6 +29,8 @@ public class GameManager : MonoBehaviour
         unit = unitManager.NewPlayerUnit(new Vector3Int(2, 0, 0));
 
         enemyManager.DetermineEnemies(2, "GrassyHills");
+
+        gameLoopController.InstantiatePlayerVision();
     }
 
     public void GameLost()

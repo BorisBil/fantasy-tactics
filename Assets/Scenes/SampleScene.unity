@@ -237,6 +237,7 @@ Transform:
   m_Children:
   - {fileID: 1968350679}
   - {fileID: 903754776}
+  - {fileID: 1579917870}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -254,6 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grassyHills: {fileID: 161391765}
   desertHills: {fileID: 161391766}
+  graphNodeList: []
 --- !u!114 &161391765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1080,6 +1082,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameLoopController: {fileID: 1898208015}
+--- !u!1 &1337943344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1337943345}
+  - component: {fileID: 1337943346}
+  m_Layer: 0
+  m_Name: VisionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1337943345
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337943344}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1883348082}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1337943346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337943344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62781688fed84a9449924e43b66c7f59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileMap: {fileID: 161391764}
+  unitManager: {fileID: 1586870097}
 --- !u!1 &1392758172
 GameObject:
   m_ObjectHideFlags: 0
@@ -1215,6 +1263,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392758172}
   m_CullTransparentMesh: 1
+--- !u!1 &1579917869
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1579917870}
+  m_Layer: 0
+  m_Name: ActiveLights
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1579917870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579917869}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 161391763}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1586870095
 GameObject:
   m_ObjectHideFlags: 0
@@ -1507,6 +1586,7 @@ Transform:
   - {fileID: 2078474868}
   - {fileID: 964108257}
   - {fileID: 1937934914}
+  - {fileID: 1337943345}
   m_Father: {fileID: 977505443}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1526,6 +1606,7 @@ MonoBehaviour:
   unitManager: {fileID: 1586870097}
   itemManager: {fileID: 1937934915}
   enemyManager: {fileID: 2078474869}
+  gameLoopController: {fileID: 1898208015}
 --- !u!1 &1898208013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1572,10 +1653,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerController: {fileID: 2075930465}
   unitManager: {fileID: 1586870097}
-  AIbehaviors: {fileID: 132899870}
+  behaviors: {fileID: 132899870}
+  visionManager: {fileID: 1337943346}
   endTurnButton: {fileID: 1157064845}
   attackButton: {fileID: 727289976}
+  visibleUnits: []
+  unitsToRemove: []
+  enemyVisibleUnits: []
   AITurn: 0
+  map: {fileID: 161391762}
+  tilelights: {fileID: 1579917869}
 --- !u!1 &1937934913
 GameObject:
   m_ObjectHideFlags: 0

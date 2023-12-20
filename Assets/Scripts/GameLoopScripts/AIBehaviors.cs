@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// 
@@ -61,6 +62,10 @@ public class AIBehaviors : MonoBehaviour
                     toMoveQAI.RemoveAt(0);
                     toMoveToAI.RemoveAt(0);
 
+                    gameLoopController.ListEnemyVisibleUnits(unit);
+                    gameLoopController.UpdateEnemyVisibleUnits();
+                    gameLoopController.UpdatePlayerVisibleUnits();
+
                     if (unit.status == "Awake")
                     {
                         if (unit.actionPoints >= unit.weapon.actionCost)
@@ -91,6 +96,8 @@ public class AIBehaviors : MonoBehaviour
                     {
                         unit.unitPosition = unit.currentPath[0].location;
                         unit.transform.position = unit.unitPosition;
+                        gameLoopController.UpdateEnemyVisibleUnits();
+                        gameLoopController.UpdatePlayerVisibleUnits();
                         unit.currentPath.RemoveAt(0);
                     }
                 }
@@ -118,6 +125,7 @@ public class AIBehaviors : MonoBehaviour
             foreach (Unit unit in asleepPod.unitsInPod)
             {
                 gameLoopController.ListEnemyVisibleUnits(unit);
+                gameLoopController.UpdateEnemyVisibleUnits();
 
                 if (unit.visibleUnits.Count > 0)
                 {
@@ -193,6 +201,9 @@ public class AIBehaviors : MonoBehaviour
     public void ZombieBehavior(Unit unit)
     {
         gameLoopController.ListEnemyAttackSelectable(unit);
+        gameLoopController.UpdateEnemyVisibleUnits();
+
+        Debug.Log(unit.id);
 
         if (unit.attackableUnits.Count > 0)
         {
@@ -223,7 +234,7 @@ public class AIBehaviors : MonoBehaviour
             generatedPaths.Sort((a, b) => a.Count - b.Count);
 
             List<Node> closestTarget = generatedPaths[0];
-            Node targetNode = closestTarget[closestTarget.Count - 1];
+            Node targetNode = closestTarget.LastOrDefault();
 
             generatedPaths.Clear();
 
@@ -262,7 +273,7 @@ public class AIBehaviors : MonoBehaviour
                             if (neighbor.isWalkable)
                             {
                                 finalPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
-                                finalNode = finalPath[finalPath.Count - 1];
+                                finalNode = finalPath.LastOrDefault();
                             }
                         }
                     }
@@ -273,12 +284,20 @@ public class AIBehaviors : MonoBehaviour
 
                     List<Node> closestPath = generatedPaths[0];
 
-                    for (int i = 0; i < unit.movementRange; i++)
+                    int i = 0;
+
+                    foreach (Node node in closestPath)
                     {
-                        finalPath.Add(closestPath[i]);
+                        i = i + (int)node.movementCost;
+                        finalPath.Add(node);
+
+                        if (i >= unit.movementRange)
+                        {
+                            break;
+                        }
                     }
 
-                    finalNode = finalPath[finalPath.Count - 1];
+                    finalNode = finalPath.LastOrDefault(); 
                 }
             }
 
@@ -303,6 +322,8 @@ public class AIBehaviors : MonoBehaviour
         List<Node> finalPath = new List<Node>();
         Node finalNode = null;
 
+        Debug.Log(unit.id);
+
         foreach (Unit enemy in unitManager.playerUnits)
         {
             Vector3Int enemyPosition = new Vector3Int((int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z);
@@ -317,7 +338,7 @@ public class AIBehaviors : MonoBehaviour
         generatedPaths.Sort((a, b) => a.Count - b.Count);
 
         List<Node> closestTarget = generatedPaths[0];
-        Node targetNode = closestTarget[closestTarget.Count - 1];
+        Node targetNode = closestTarget.LastOrDefault();
 
         generatedPaths.Clear();
 
@@ -356,7 +377,7 @@ public class AIBehaviors : MonoBehaviour
                         if (neighbor.isWalkable)
                         {
                             finalPath = tileMap.GeneratePathTo(neighbor.location, unit.unitPosition);
-                            finalNode = finalPath[finalPath.Count - 1];
+                            finalNode = finalPath.LastOrDefault();
                         }
                     }
                 }
@@ -367,12 +388,20 @@ public class AIBehaviors : MonoBehaviour
 
                 List<Node> closestPath = generatedPaths[0];
 
-                for (int i = 0; i < unit.movementRange; i++)
+                int i = 0;
+
+                foreach (Node node in closestPath)
                 {
-                    finalPath.Add(closestPath[i]);
+                    i = i + (int)node.movementCost;
+                    finalPath.Add(node);
+
+                    if (i >= unit.movementRange)
+                    {
+                        break;
+                    }
                 }
 
-                finalNode = finalPath[finalPath.Count - 1];
+                finalNode = finalPath.LastOrDefault();
             }
         }
 

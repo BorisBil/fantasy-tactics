@@ -40,6 +40,8 @@ public class PlayerController : MonoBehaviour
         toMoveQ = new List<Unit>();
         toMoveTo = new List<Tile>();
 
+        gameLoopController.SetUpLists();
+
         SetMoveMode();
     }
 
@@ -170,6 +172,9 @@ public class PlayerController : MonoBehaviour
                     toMoveTo.RemoveAt(0);
 
                     gameLoopController.ListPlayerVisibleUnits(unit);
+                    gameLoopController.UpdatePlayerVisibleUnits();
+                    gameLoopController.UpdatePlayerVision(unit);
+
                     gameLoopController.ListPlayerAttackSelectable(unit);
 
                     if (selectedUnit != null && selectedUnit.GetComponent<Unit>() == unit)
@@ -194,7 +199,11 @@ public class PlayerController : MonoBehaviour
                     {
                         unit.unitPosition = unit.currentPath[0].location;
                         unit.transform.position = unit.unitPosition;
+                        
                         gameLoopController.ListPlayerVisibleUnits(unit);
+                        gameLoopController.UpdatePlayerVisibleUnits();
+                        gameLoopController.UpdatePlayerVision(unit);
+
                         unit.currentPath.RemoveAt(0);
                     }
                 }
