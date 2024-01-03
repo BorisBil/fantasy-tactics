@@ -14,12 +14,11 @@ public class TileMap : MonoBehaviour
 
     public VisionManager visionManager;
 
-    public Node[,,] graph;
-    public TileLight[,,] lightsGraph;
-    
+    public Dictionary<Vector3, Node> graph;
+    public Dictionary<Vector3, TileLight> lightsGraph;
+
     public List<TileLight> lights;
-    
-    public List<Vector3Int> graphNodeList;
+
     public List<Node> walkableNodes;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS
 
@@ -31,17 +30,18 @@ public class TileMap : MonoBehaviour
         
         graph = grassyHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
         lights = grassyHills.GenerateMapLighting(mapSizeX, mapSizeY, mapSizeZ);
+        
         walkableNodes = grassyHills.ReturnWalkableNodeList();
         lightsGraph = grassyHills.ReturnLightGraph();
     }
 
     public void GenerateDesertHills(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
-        desertHills.GenerateMapData(mapSizeX, mapSizeY, mapSizeZ);
-        desertHills.GenerateMapVisual();
+        //desertHills.GenerateMapData(mapSizeX, mapSizeY, mapSizeZ);
+        //desertHills.GenerateMapVisual();
         
-        graph = desertHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
-        graphNodeList = desertHills.ReturnGraphList();
+        //graph = desertHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
+        //graphNodeList = desertHills.ReturnGraphList();
     }
 
     /* MOVEMENT RANGE
@@ -51,7 +51,7 @@ public class TileMap : MonoBehaviour
     {
         /// BFS until depth character movement range, return all nodes traversed
         Vector3 unitLocation = character.unitPosition;
-        Node startNode = graph[(int)unitLocation.x, (int)unitLocation.y, (int)unitLocation.z];
+        Node startNode = graph[new Vector3(unitLocation.x, unitLocation.y, unitLocation.z)];
         
         Dictionary<Node, float> movement_available = new Dictionary<Node, float>();
         
@@ -84,13 +84,14 @@ public class TileMap : MonoBehaviour
                 }
             }
         }
+        
         return range;
     }
 
     /* MOVING THE UNIT
      * This function is responsible for moving units (NOT PATHFINDING)
      */
-    public void UpdatePath(Vector3Int gridCoords, Unit unit)
+    public void UpdatePath(Vector3 gridCoords, Unit unit)
     {
         List<Node> path = GeneratePathTo(gridCoords, unit.unitPosition);
 
@@ -100,10 +101,10 @@ public class TileMap : MonoBehaviour
     /* PATHFINDING
      * This function is responsible for the pathfinding behind moving units
      */
-    public List<Node> GeneratePathTo(Vector3Int targetLocation, Vector3 unitLocation)
+    public List<Node> GeneratePathTo(Vector3 targetLocation, Vector3 unitLocation)
     {
-        Node startNode = graph[(int)unitLocation.x, (int)unitLocation.y, (int)unitLocation.z];
-        Node endNode = graph[targetLocation.x, targetLocation.y, targetLocation.z];
+        Node startNode = graph[new Vector3(unitLocation.x, unitLocation.y, unitLocation.z)];
+        Node endNode = graph[new Vector3(targetLocation.x, targetLocation.y, targetLocation.z)];
 
         List<Node> openList = new List<Node>();
         Dictionary<Node, float> cost_so_far = new Dictionary<Node, float>();
@@ -160,7 +161,7 @@ public class TileMap : MonoBehaviour
     }
 
     /// Gets the (3D Version?) Manhattan distance between nodes
-    public int GetDistance(Node start, Node end)
+    public float GetDistance(Node start, Node end)
     {
         return  Mathf.Abs(start.location.x - end.location.x) + 
                 Mathf.Abs(start.location.y - end.location.y) + 

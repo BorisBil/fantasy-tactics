@@ -27,7 +27,6 @@ public class GameLoopController : MonoBehaviour
     public List<Unit> enemyVisibleUnits;
 
     public List<GameObject> spawnedlights;
-    public List<Vector3Int> activetilelocations;
 
     public bool AITurn;
 

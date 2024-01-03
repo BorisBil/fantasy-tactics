@@ -136,7 +136,7 @@ Transform:
   m_Children:
   - {fileID: 2647393498934024734}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3334672770582318579
 MonoBehaviour:
@@ -151,10 +151,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   name: 
+  id: 0
   unitModel: {fileID: 0}
   unitObject: {fileID: 0}
   unitDescription: 
   unitType: 
+  status: 
   unitSpeed: 0
   baseMovement: 0
   movementRange: 0
@@ -164,6 +166,7 @@ MonoBehaviour:
   armorHP: 0
   armorAP: 0
   attackRange: 0
+  visionRadius: 0
   unitTeam: 0
   level: 0
   actionPoints: 0
@@ -173,5 +176,6 @@ MonoBehaviour:
   armor: []
   inventory: []
   attackableUnits: []
+  visibleUnits: []
   isMoving: 0
   isSelectable: 0

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Prop : MonoBehaviour
 {
-    public Vector3Int location;
+    public Vector3 location;
 
     public bool isStructure;
     public bool blocksTile;

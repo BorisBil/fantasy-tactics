@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    public Vector3Int tileLocation;
+    public Vector3 tileLocation;
     public bool isClickable = false;
 
     public bool isRamp;

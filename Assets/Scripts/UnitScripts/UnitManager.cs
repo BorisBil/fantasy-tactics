@@ -32,7 +32,7 @@ public class UnitManager : MonoBehaviour
         unit.unitDescription = "Player unit";
         unit.unitType = "Fighter";
 
-        unit.unitSpeed = 5;
+        unit.unitSpeed = 2;
         unit.baseHP = 5;
         unit.baseMovement = 5;
         unit.level = 1;

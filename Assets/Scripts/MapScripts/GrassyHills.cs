@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static PropSets;
+using static UnityEditor.Progress;
 
 /// 
 /// THIS GENERATES THE DATA AND SPAWNS IN THE MAP FOR THE GRASSYHILLS ENVIRONMENT
@@ -11,15 +14,11 @@ public class GrassyHills : MonoBehaviour
     public TileSets.GrassyHillTiles[] grassyHills;
     public PropSets.GrassyHillProps[] grassyHillsProps;
 
-    private int[,,] tileTypeMap;
-    private int[,,] propTypeMap;
-
-    private TileLight[,,] lightGraph;
-    private Node[,,] graph;
-
-    private List<Vector3Int> tileMapList;
-    private List<Vector3Int> graphNodeList;
-    private List<Vector3Int> propTypeList;
+    private Dictionary<Vector3, TileSets.GrassyHillTiles> tileTypeMap;
+    private Dictionary<Vector3, GrassyHillProps> propTypeMap;
+    
+    private Dictionary<Vector3, Node> pathfindingGraph;
+    private Dictionary<Vector3, TileLight> lightMap;
     
     private List<Prop> propList;
     private List<Node> walkableNodes;
@@ -35,14 +34,13 @@ public class GrassyHills : MonoBehaviour
      */
     public void GenerateMapData(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
-        tileTypeMap = new int[mapSizeX, mapSizeY, mapSizeZ];
-        tileMapList = new List<Vector3Int>();
+        tileTypeMap = new Dictionary<Vector3, TileSets.GrassyHillTiles>();
 
         for (int x = 0; x < mapSizeX; x++)
         {
             for (int y = 0; y < mapSizeY; y++)
             {
-                if (tileMapList.Contains(new Vector3Int(x, y, 0)))
+                if (tileTypeMap.ContainsKey(new Vector3(x, y, 0)))
                 {
                     continue;
                 }
@@ -52,51 +50,36 @@ public class GrassyHills : MonoBehaviour
 
                 if (rollTerrainChance <= 0.9f && x < mapSizeX - 2 && y < mapSizeY - 2)
                 {
-                    tileTypeMap[x, y, 0] = 0;
-                    tileMapList.Add(new Vector3Int(x, y, 0));
+                    tileTypeMap[new Vector3(x, y, 0)] = grassyHills[0];
 
                     if (rollElevationChance > 0.90f && x < mapSizeX - 2 && y < mapSizeY - 2)
                     {
-                        tileTypeMap[x, y + 1, 1] = 0;
-                        tileTypeMap[x, y + 2, 1] = 0;
-                        tileTypeMap[x + 1, y + 1, 1] = 0;
-                        tileTypeMap[x + 1, y + 2, 1] = 0;
-
-                        tileMapList.Add(new Vector3Int(x, y + 1, 1));
-                        tileMapList.Add(new Vector3Int(x, y + 2, 1));
-                        tileMapList.Add(new Vector3Int(x + 1, y + 1, 1));
-                        tileMapList.Add(new Vector3Int(x + 1, y + 2, 1));
+                        tileTypeMap[new Vector3(x, y + 1, 1)] = grassyHills[0];
+                        tileTypeMap[new Vector3(x, y + 2, 1)] = grassyHills[0];
+                        tileTypeMap[new Vector3(x + 1, y + 1, 1)] = grassyHills[0];
+                        tileTypeMap[new Vector3(x + 1, y + 2, 1)] = grassyHills[0];
 
                         float rollMountainChance = Random.Range(0.0f, 1.0f);
                         if (rollMountainChance > 0.9f)
                         {
-                            tileTypeMap[x, y + 2, 2] = 2;
-                            tileTypeMap[x + 1, y + 2, 2] = 2;
-
-                            tileMapList.Add(new Vector3Int(x, y + 2, 2));
-                            tileMapList.Add(new Vector3Int(x + 1, y + 2, 2));
+                            tileTypeMap[new Vector3(x, y + 2, 2)] = grassyHills[2];
+                            tileTypeMap[new Vector3(x + 1, y + 2, 2)] = grassyHills[2];
                         }
                     }
                 }
                 else
                 {
-                    tileTypeMap[x, y, 0] = 0;
-                    tileMapList.Add(new Vector3Int(x, y, 0));
+                    tileTypeMap[new Vector3(x, y, 0)] = grassyHills[0];
                 }
                 
                 if (x < mapSizeX - 2 && y < mapSizeY - 2)
                 {
                     if (rollTerrainChance > 0.9f && rollTerrainChance < 1.0f)
                     {
-                        tileTypeMap[x, y, 0] = 1;
-                        tileTypeMap[x + 1, y, 0] = 1;
-                        tileTypeMap[x, y + 1, 0] = 1;
-                        tileTypeMap[x + 1, y + 1, 0] = 1;
-
-                        tileMapList.Add(new Vector3Int(x, y, 0));
-                        tileMapList.Add(new Vector3Int(x + 1, y, 0));
-                        tileMapList.Add(new Vector3Int(x, y + 1, 0));
-                        tileMapList.Add(new Vector3Int(x + 1, y + 1, 0));
+                        tileTypeMap[new Vector3(x, y, 0)] = grassyHills[1];
+                        tileTypeMap[new Vector3(x + 1, y, 0)] = grassyHills[1];
+                        tileTypeMap[new Vector3(x, y + 1, 0)] = grassyHills[1];
+                        tileTypeMap[new Vector3(x + 1, y + 1, 0)] = grassyHills[1];
                     }
                 }
             }
@@ -106,18 +89,16 @@ public class GrassyHills : MonoBehaviour
     /* GENERATE PROP DATA
      * This function is responsible for generating the random cover and props on the map
      */
-
     public void GeneratePropData(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
-        propTypeMap = new int[mapSizeX, mapSizeY, mapSizeZ];
-        
-        propTypeList = new List<Vector3Int>();
-        propList = new List<Prop>();
+        propTypeMap = new Dictionary<Vector3, GrassyHillProps>();
 
-        foreach (var item in tileMapList)
+        foreach (KeyValuePair<Vector3, TileSets.GrassyHillTiles> tile in tileTypeMap)
         {
-            if (!tileMapList.Contains(new Vector3Int(item.x, item.y, item.z + 1))
-                && !propTypeList.Contains(new Vector3Int(item.x, item.y, item.z)))
+            Vector3 tileLocation = tile.Key;
+
+            if (!tileTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y, tileLocation.z + 1))
+                && !propTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y, tileLocation.z)))
             {
                 float propChance = Random.Range(0.0f, 1.0f);
 
@@ -127,30 +108,25 @@ public class GrassyHills : MonoBehaviour
                     
                     if (propTypeChance < 0.3)
                     {
-                        propTypeMap[item.x, item.y, item.z] = 0;
-                        propTypeList.Add(new Vector3Int(item.x, item.y, item.z));
+                        propTypeMap[tileLocation] = grassyHillsProps[0];
                     }
 
                     if (propTypeChance > 0.3 && propTypeChance < 0.8)
                     {
-                        propTypeMap[item.x, item.y, item.z] = 1;
-                        propTypeList.Add(new Vector3Int(item.x, item.y, item.z));
+                        propTypeMap[tileLocation] = grassyHillsProps[1];
                     }
 
                     if (propTypeChance > 0.8)
                     {
-                        if (item.x < mapSizeX - 2
-                            && tileMapList.Contains(new Vector3Int(item.x + 1, item.y, item.z))
-                            && tileMapList.Contains(new Vector3Int(item.x + 2, item.y, item.z))
-                            && !tileMapList.Contains(new Vector3Int(item.x + 2, item.y, item.z + 1))
-                            && !tileMapList.Contains(new Vector3Int(item.x + 2, item.y, item.z + 1)))
+                        if (tileLocation.x < mapSizeX - 2
+                            && propTypeMap.ContainsKey(new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z))
+                            && propTypeMap.ContainsKey(new Vector3(tileLocation.x + 2, tileLocation.y, tileLocation.z))
+                            && !propTypeMap.ContainsKey(new Vector3(tileLocation.x + 2, tileLocation.y, tileLocation.z + 1))
+                            && !propTypeMap.ContainsKey(new Vector3(tileLocation.x + 2, tileLocation.y, tileLocation.z + 1)))
                         {
-                            propTypeMap[item.x, item.y, item.z] = 2;
-                            propTypeMap[item.x + 1, item.y, item.z] = 3;
-                            propTypeMap[item.x + 2, item.y, item.z] = 4;
-                            propTypeList.Add(new Vector3Int(item.x, item.y, item.z));
-                            propTypeList.Add(new Vector3Int(item.x + 1, item.y, item.z));
-                            propTypeList.Add(new Vector3Int(item.x + 2, item.y, item.z));
+                            propTypeMap[new Vector3(tileLocation.x, tileLocation.y, tileLocation.z)] = grassyHillsProps[2];
+                            propTypeMap[new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z)] = grassyHillsProps[3];
+                            propTypeMap[new Vector3(tileLocation.x + 2, tileLocation.y, tileLocation.z)] = grassyHillsProps[4];
                         }
                     }
                 }
@@ -163,34 +139,36 @@ public class GrassyHills : MonoBehaviour
      */
     public void GenerateMapVisual()
     {
-        foreach (var item in tileMapList)
+        propList = new List<Prop>();
+
+        foreach (KeyValuePair<Vector3, TileSets.GrassyHillTiles> tileLocation in tileTypeMap)
         {
             /// Instantiating the tiles after setting their type based on the map graph
-            TileSets.GrassyHillTiles type = grassyHills[tileTypeMap[item.x, item.y, item.z]];
-            GameObject tile = Instantiate(type.tileVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
+            TileSets.GrassyHillTiles type = tileLocation.Value;
+            GameObject tile = Instantiate(type.tileVisualPrefab, new Vector3(tileLocation.Key.x, tileLocation.Key.y, tileLocation.Key.z), Quaternion.identity);
             tile.transform.parent = tiles.transform;
 
             /// Setting clickable tiles based on type
             Tile clickableTile = tile.GetComponent<Tile>();
-            clickableTile.tileLocation = item;
+            clickableTile.tileLocation = tileLocation.Key;
 
-            if (propTypeList.Contains(new Vector3Int(item.x, item.y, item.z)))
+            if (propTypeMap.ContainsKey(new Vector3(tileLocation.Key.x, tileLocation.Key.y, tileLocation.Key.z)))
             {
                 clickableTile.hasProp = true;
             }
         }
 
-        foreach (var item in propTypeList)
+        foreach (KeyValuePair<Vector3, GrassyHillProps> tileProp in propTypeMap)
         {
             /// Instantiating the props after setting their type based on the prop graph
-            PropSets.GrassyHillProps type = grassyHillsProps[tileTypeMap[item.x, item.y, item.z]];
-            GameObject prop = Instantiate(type.propVisualPrefab, new Vector3(item.x, item.y, item.z), Quaternion.identity);
+            PropSets.GrassyHillProps type = tileProp.Value;
+            GameObject prop = Instantiate(type.propVisualPrefab, new Vector3(tileProp.Key.x, tileProp.Key.y, tileProp.Key.z), Quaternion.identity);
             prop.transform.parent = props.transform;
 
             /// Setting props based on type
             Prop propInfo = prop.GetComponent<Prop>();
             
-            propInfo.location = item;
+            propInfo.location = tileProp.Key;
             propInfo.isStructure = type.isStructure;
             propInfo.blocksTile = type.blocksTile;
             propInfo.coverType = type.coverType;
@@ -202,95 +180,97 @@ public class GrassyHills : MonoBehaviour
     /* MAP GRAPH
      * This function creates nodes on all of the tiles and defines neighbors for pathfinding usage
      */
-    public Node[,,] GenerateMapGraph(int mapSizeX, int mapSizeY, int mapSizeZ)
+    public Dictionary<Vector3, Node> GenerateMapGraph(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
-        graph = new Node[mapSizeX, mapSizeY, mapSizeZ];
-        graphNodeList = new List<Vector3Int>();
+        pathfindingGraph = new Dictionary<Vector3, Node>();
 
         /// Generate a node for each tile we have on the map
-        foreach (var item in tileMapList)
+        foreach (KeyValuePair<Vector3, TileSets.GrassyHillTiles> tileLocation in tileTypeMap)
         {
-            graph[item.x, item.y, item.z] = new Node();
-            graph[item.x, item.y, item.z].movementCost =
-                grassyHills[tileTypeMap[item.x, item.y, item.z]].movementCost;
+            TileSets.GrassyHillTiles type = tileLocation.Value;
+            Vector3 newNodeLocation = tileLocation.Key;
+            
+            pathfindingGraph[newNodeLocation] = new Node();
+            pathfindingGraph[newNodeLocation].movementCost = type.movementCost;
 
             /// Setting unwalkable tiletypes to not be walkable on the node grid
-            if (grassyHills[tileTypeMap[item.x, item.y, item.z]].isWalkable == true)
+            if (type.isWalkable == true)
             {
-                graph[item.x, item.y, item.z].isWalkable = true;
+                pathfindingGraph[newNodeLocation].isWalkable = true;
             }
             else
             {
-                graph[item.x, item.y, item.z].isWalkable = false;
+                pathfindingGraph[newNodeLocation].isWalkable = false;
             }
 
             /// Setting "underground" nodes to be unwalkable
-            if (tileMapList.Contains(new Vector3Int(item.x, item.y, item.z + 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(newNodeLocation.x, newNodeLocation.y, newNodeLocation.z + 1)))
             {
-                graph[item.x, item.y, item.z].isWalkable = false;
+                pathfindingGraph[newNodeLocation].isWalkable = false;
             }
 
-            graph[item.x, item.y, item.z].location = new Vector3Int(item.x, item.y, item.z);
-            graphNodeList.Add(item);
+            pathfindingGraph[newNodeLocation].location = new Vector3(newNodeLocation.x, newNodeLocation.y, newNodeLocation.z);
         }
 
-        foreach (var index in graphNodeList)
+        foreach (KeyValuePair<Vector3, Node> node in pathfindingGraph)
         {
+            Vector3 nodeLocation = node.Key;
+
             /// Adding all the neighbors that are on the same plane
-            if (tileMapList.Contains(new Vector3Int(index.x - 1, index.y, index.z)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z)))
             {
-                graph[index.x, index.y, index.z].neighbors.Add(graph[index.x - 1, index.y, index.z]);
+                pathfindingGraph[nodeLocation].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z)]);
             }
 
-            if (tileMapList.Contains(new Vector3Int(index.x + 1, index.y, index.z)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z)))
             {
-                graph[index.x, index.y, index.z].neighbors.Add(graph[index.x + 1, index.y, index.z]);
+                pathfindingGraph[nodeLocation].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z)]);
             }
 
-            if (tileMapList.Contains(new Vector3Int(index.x, index.y - 1, index.z)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z)))
             {
-                graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y - 1, index.z]);
+                pathfindingGraph[nodeLocation].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z)]);
             }
 
-            if (tileMapList.Contains(new Vector3Int(index.x, index.y + 1, index.z)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z)))
             {
-                graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y + 1, index.z]);
+                pathfindingGraph[nodeLocation].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z)]);
             }
 
             /// Adding "steps" between higher/lower ground to the neighbors
-            if (tileMapList.Contains(new Vector3Int(index.x - 1, index.y, index.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)))
             {
-                if (graph[index.x - 1, index.y, index.z - 1].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)].isWalkable)
                 {
-                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x - 1, index.y, index.z - 1]);
-                    graph[index.x - 1, index.y, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
 
-            if (tileMapList.Contains(new Vector3Int(index.x + 1, index.y, index.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)))
             {
-                if (graph[index.x + 1, index.y, index.z - 1].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)].isWalkable)
                 {
-                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x + 1, index.y, index.z - 1]);
-                    graph[index.x + 1, index.y, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
 
-            if (tileMapList.Contains(new Vector3Int(index.x, index.y - 1, index.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)))
             {
-                if (graph[index.x, index.y - 1, index.z - 1].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)].isWalkable)
                 {
-                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y - 1, index.z - 1]);
-                    graph[index.x, index.y - 1, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
 
-            if (tileMapList.Contains(new Vector3Int(index.x, index.y + 1, index.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)))
             {
-                if (graph[index.x, index.y + 1, index.z - 1].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)].isWalkable)
                 {
-                    graph[index.x, index.y, index.z].neighbors.Add(graph[index.x, index.y + 1, index.z - 1]);
-                    graph[index.x, index.y + 1, index.z - 1].neighbors.Add(graph[index.x, index.y, index.z]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
         }
@@ -299,37 +279,27 @@ public class GrassyHills : MonoBehaviour
         {
             if (prop.blocksTile)
             {
-                graph[prop.location.x, prop.location.y, prop.location.z].isWalkable = false;
+                pathfindingGraph[new Vector3(prop.location.x, prop.location.y, prop.location.z)].isWalkable = false;
             }
         }
 
         GetWalkableNodes();
 
-        return graph;
+        return pathfindingGraph;
     }
 
-    public void GetWalkableNodes()
-    {
-        walkableNodes = new List<Node>();
-
-        foreach (Vector3Int node in graphNodeList)
-        {
-            if (graph[node.x, node.y, node.z].isWalkable)
-            {
-                walkableNodes.Add(graph[node.x, node.y, node.z]);
-            }
-        }
-    }
-
+    /* MAP LIGHTS
+     * This function creates spotlights over all walkable tiles
+     */
     public List<TileLight> GenerateMapLighting(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
-        lightGraph = new TileLight[mapSizeX, mapSizeY, mapSizeZ + 5];
+        lightMap = new Dictionary<Vector3, TileLight>();
 
         List<TileLight> tileLights = new List<TileLight>();
 
         foreach (Node node in walkableNodes)
         {
-            Vector3Int spawnAt = new Vector3Int(node.location.x, node.location.y, node.location.z + 3);
+            Vector3 spawnAt = new Vector3(node.location.x, node.location.y, node.location.z + 5);
             GameObject activeTileLight = Resources.Load("Prefabs/Lights/TileLight") as GameObject;
             GameObject spawnedLight = Instantiate(activeTileLight, spawnAt, Quaternion.identity);
 
@@ -341,10 +311,11 @@ public class GrassyHills : MonoBehaviour
             tileLight.enabledstatus = false;
             tileLight.lightobject = spawnedLight;
 
-            lightGraph[spawnAt.x, spawnAt.y, spawnAt.z] = tileLight;
+            lightMap[new Vector3(spawnAt.x, spawnAt.y, spawnAt.z)] = tileLight;
             tileLights.Add(tileLight);
         }
 
+        /// Deactivate the lights
         foreach (TileLight tileLight in tileLights)
         {
             if (!tileLight.enabledstatus)
@@ -356,14 +327,23 @@ public class GrassyHills : MonoBehaviour
         return tileLights;
     }
 
-    public TileLight[,,] ReturnLightGraph()
+    /// Get walkable nodes from the node dictionary
+    public void GetWalkableNodes()
     {
-        return lightGraph;
+        walkableNodes = new List<Node>();
+
+        foreach (KeyValuePair<Vector3, Node> tileLocation in pathfindingGraph)
+        {
+            if (pathfindingGraph[tileLocation.Key].isWalkable)
+            {
+                walkableNodes.Add(pathfindingGraph[tileLocation.Key]);
+            }
+        }
     }
 
-    public List<Vector3Int> ReturnGraphList()
+    public Dictionary<Vector3, TileLight> ReturnLightGraph()
     {
-        return graphNodeList;
+        return lightMap;
     }
 
     public List<Node> ReturnWalkableNodeList()

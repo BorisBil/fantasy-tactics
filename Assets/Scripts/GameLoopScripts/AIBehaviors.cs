@@ -222,13 +222,13 @@ public class AIBehaviors : MonoBehaviour
 
             foreach (Unit enemy in unitManager.playerUnits)
             {
-                Vector3Int enemyPosition = new Vector3Int((int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z);
-                tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = true;
+                Vector3 enemyPosition = new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z);
+                tileMap.graph[new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z)].isWalkable = true;
 
                 List<Node> path = tileMap.GeneratePathTo(enemyPosition, unit.unitPosition);
 
                 generatedPaths.Add(path);
-                tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = false;
+                tileMap.graph[new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z)].isWalkable = false;
             }
 
             generatedPaths.Sort((a, b) => a.Count - b.Count);
@@ -268,7 +268,7 @@ public class AIBehaviors : MonoBehaviour
                 {
                     foreach (Unit enemy in unitManager.playerUnits)
                     {
-                        foreach (Node neighbor in tileMap.graph[(int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z].neighbors)
+                        foreach (Node neighbor in tileMap.graph[new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z)].neighbors)
                         {
                             if (neighbor.isWalkable)
                             {
@@ -306,8 +306,8 @@ public class AIBehaviors : MonoBehaviour
 
             unit.currentPath = finalPath;
 
-            tileMap.graph[finalNode.location.x, finalNode.location.y, finalNode.location.z].isWalkable = false;
-            tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
+            tileMap.graph[new Vector3(finalNode.location.x, finalNode.location.y, finalNode.location.z)].isWalkable = false;
+            tileMap.graph[new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z)].isWalkable = true;
         }
     }
 
@@ -327,12 +327,12 @@ public class AIBehaviors : MonoBehaviour
         foreach (Unit enemy in unitManager.playerUnits)
         {
             Vector3Int enemyPosition = new Vector3Int((int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z);
-            tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = true;
+            tileMap.graph[new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z)].isWalkable = true;
 
             List<Node> path = tileMap.GeneratePathTo(enemyPosition, unit.unitPosition);
 
             generatedPaths.Add(path);
-            tileMap.graph[enemyPosition.x, enemyPosition.y, enemyPosition.z].isWalkable = false;
+            tileMap.graph[new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z)].isWalkable = false;
         }
 
         generatedPaths.Sort((a, b) => a.Count - b.Count);
@@ -372,7 +372,7 @@ public class AIBehaviors : MonoBehaviour
             {
                 foreach (Unit enemy in unitManager.playerUnits)
                 {
-                    foreach (Node neighbor in tileMap.graph[(int)enemy.unitPosition.x, (int)enemy.unitPosition.y, (int)enemy.unitPosition.z].neighbors)
+                    foreach (Node neighbor in tileMap.graph[new Vector3(enemy.unitPosition.x, enemy.unitPosition.y, enemy.unitPosition.z)].neighbors)
                     {
                         if (neighbor.isWalkable)
                         {
@@ -410,8 +410,8 @@ public class AIBehaviors : MonoBehaviour
 
         unit.currentPath = finalPath;
 
-        tileMap.graph[finalNode.location.x, finalNode.location.y, finalNode.location.z].isWalkable = false;
-        tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
+        tileMap.graph[new Vector3(finalNode.location.x, finalNode.location.y, finalNode.location.z)].isWalkable = false;
+        tileMap.graph[new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z)].isWalkable = true;
 
         unit.status = "Awoken";
     }

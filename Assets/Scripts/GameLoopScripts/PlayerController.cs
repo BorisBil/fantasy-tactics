@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour
                         tile = mouseOver.GetComponent<Tile>();
                         unit = selectedUnit.GetComponent<Unit>();
 
-                        if (tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable)
+                        if (tileMap.graph[new Vector3(tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z)].isWalkable)
                         {
                             bool contains = false;
 
@@ -135,8 +135,8 @@ public class PlayerController : MonoBehaviour
 
                                 inRangeTiles = null;
 
-                                tileMap.graph[(int)unit.unitPosition.x, (int)unit.unitPosition.y, (int)unit.unitPosition.z].isWalkable = true;
-                                tileMap.graph[tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z].isWalkable = false;
+                                tileMap.graph[new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z)].isWalkable = true;
+                                tileMap.graph[new Vector3(tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z)].isWalkable = false;
 
                             }
                         }

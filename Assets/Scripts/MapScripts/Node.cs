@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Node
 {
-    public Vector3Int location;
+    public Vector3 location;
 
     public float G;
     public float H;

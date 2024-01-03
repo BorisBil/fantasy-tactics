@@ -121,4 +121,5 @@ MonoBehaviour:
   tileLocation: {x: 0, y: 0, z: 0}
   isClickable: 0
   isRamp: 0
+  hasProp: 0
   map: {fileID: 0}
