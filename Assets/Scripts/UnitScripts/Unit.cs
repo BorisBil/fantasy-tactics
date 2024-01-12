@@ -53,6 +53,8 @@ public class Unit : MonoBehaviour
     public List<Unit> visibleUnits;
     public List<Node> visibleTiles;
 
+    public Dictionary<string, string> inCover;
+
     public bool isMoving;
     public bool isSelectable;
     // NECESSARY PUBLIC/PRIVATE VARIABLES, LISTS, AND ARRAYS

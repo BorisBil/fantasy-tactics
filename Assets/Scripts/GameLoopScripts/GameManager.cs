@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
         enemyManager.CreateEnemyDatabases();
         itemManager.CreateItemDatabase();
 
-        tileMap.GenerateGrassyHills(10, 10, 5);
+        tileMap.GenerateGrassyHills(15, 15, 5);
 
         Unit unit = unitManager.NewPlayerUnit(new Vector3Int(0, 0, 0));
 

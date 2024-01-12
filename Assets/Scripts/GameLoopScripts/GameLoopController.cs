@@ -19,14 +19,13 @@ public class GameLoopController : MonoBehaviour
     
     public EndTurn endTurnButton;
     public Attack attackButton;
+    public RotateCamera rotateCameraButton;
 
     float chancetohit;
 
     public List<Unit> visibleUnits;
     public List<Unit> unitsToRemove;
     public List<Unit> enemyVisibleUnits;
-
-    public List<GameObject> spawnedlights;
 
     public bool AITurn;
 
@@ -39,6 +38,7 @@ public class GameLoopController : MonoBehaviour
     {
         playerController.transitionTurn = true;
         attackButton.HideButton();
+        rotateCameraButton.HideButton();
         behaviors.AITurn();
     }
 
@@ -67,6 +67,49 @@ public class GameLoopController : MonoBehaviour
     public void UpdatePlayerVision(Unit unit)
     {
         visionManager.UpdateVision(unit);
+    }
+
+    public void UpdateUnitCover(Unit unit, Tile tile)
+    {
+        if (tile == null)
+        {
+            Dictionary<string, string> emptyCover = new Dictionary<string, string>();
+
+            emptyCover["North"] = "None";
+            emptyCover["South"] = "None";
+            emptyCover["East"] = "None";
+            emptyCover["West"] = "None";
+
+            foreach (KeyValuePair<string, string> coverDirections in emptyCover)
+            {
+                unit.inCover[coverDirections.Key] = "None";
+            }
+        }
+
+        if (tile != null)
+        {
+            foreach (KeyValuePair<string, string> coverDirections in tile.coverOnTile)
+            {
+                unit.inCover[coverDirections.Key] = coverDirections.Value;
+            }
+
+            if (!tile.coverOnTile.ContainsKey("North"))
+            {
+                unit.inCover["North"] = "None";
+            }
+            if (!tile.coverOnTile.ContainsKey("South"))
+            {
+                unit.inCover["South"] = "None";
+            }
+            if (!tile.coverOnTile.ContainsKey("East"))
+            {
+                unit.inCover["East"] = "None";
+            }
+            if (!tile.coverOnTile.ContainsKey("West"))
+            {
+                unit.inCover["West"] = "None";
+            }
+        }
     }
 
     /// List attackable units for the player's units
@@ -110,8 +153,10 @@ public class GameLoopController : MonoBehaviour
         {
             foreach (Unit enemy in unit.visibleUnits)
             {
+                Debug.Log(enemy.id);
                 float distance = DistanceBetweenUnits(unit, enemy);
-                if ((int)enemy.unitPosition.z - (int)unit.unitPosition.z == 1)
+                Debug.Log(distance);
+                if (enemy.unitPosition.z - unit.unitPosition.z == 1)
                 {
                     distance = distance - 1;
                 }
@@ -248,7 +293,98 @@ public class GameLoopController : MonoBehaviour
     {
         unit.actionPoints = 0;
 
-        chancetohit = unit.weapon.accuracy;
+        List<string> selectedCovers = new List<string>();
+
+        float xDifference = unit.unitPosition.x - enemy.unitPosition.x;
+        float yDifference = unit.unitPosition.y - enemy.unitPosition.y;
+        float zDifference = enemy.unitPosition.z - unit.unitPosition.z;
+
+        float distance = DistanceBetweenUnits(unit, enemy);
+
+        float xCover = 0;
+        float yCover = 0;
+
+        if (xDifference < 0)
+        {
+            selectedCovers.Add("East");
+        }
+        else if (xDifference >= 0)
+        {
+            selectedCovers.Add("West");
+        }
+
+        if (yDifference < 0)
+        {
+            selectedCovers.Add("South");
+        }
+        else if (yDifference >= 0)
+        {
+            selectedCovers.Add("North");
+        }
+
+        foreach (string cover in selectedCovers)
+        {
+            string coverType = enemy.inCover[cover];
+
+            if (cover == "East" || cover == "West")
+            {
+                if (coverType == "None")
+                {
+                    xCover = 1;
+                }
+                else if (coverType == "Half")
+                {
+                    xCover = 0.75f;
+                }
+                else if (coverType == "Full")
+                {
+                    xCover = 0.5f;
+                }
+            }
+
+            if (cover == "North" || cover == "South")
+            {
+                if (coverType == "None")
+                {
+                    yCover = 1;
+                }
+                else if (coverType == "Half")
+                {
+                    yCover = 0.75f;
+                }
+                else if (coverType == "Full")
+                {
+                    yCover = 0.5f;
+                }
+            }
+        }
+
+        foreach (string cover in selectedCovers)
+        {
+            Debug.Log(cover);
+        }
+
+        float weightx = ((Mathf.Abs(xDifference)) / (Mathf.Abs(xDifference) + Mathf.Abs(yDifference)));
+        float weighty = ((Mathf.Abs(yDifference)) / (Mathf.Abs(xDifference) + Mathf.Abs(yDifference)));
+
+        chancetohit = ((unit.weapon.accuracy + (zDifference / 10)) * ((weightx * xCover) + (weighty * yCover))) * Mathf.Cos(2*((distance - unit.weapon.range + 3) / 10));
+
+        if (unit.weapon.weaponType == "Longsword" 
+            || unit.weapon.weaponType == "Shortsword"
+            || unit.weapon.weaponType == "Hands")
+        {
+            chancetohit = unit.weapon.accuracy;
+        }
+
+        if (chancetohit <= 0)
+        {
+            chancetohit = 0.3f;
+        }
+
+        if (chancetohit >= 1)
+        {
+            chancetohit = 1;
+        }
 
         float hitRoll = Random.Range(0.0f, 1.0f);
         Debug.Log(chancetohit);

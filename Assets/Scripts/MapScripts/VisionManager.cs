@@ -89,10 +89,12 @@ public class VisionManager : MonoBehaviour
             Vector3 nodeLocation = node.location;
             float distance = tileMap.GetDistance(graph[unitPosition], graph[nodeLocation]);
 
-            if (distance <= unit.visionRadius)
+            float visionRadius = unit.visionRadius + 2 * (unit.unitPosition.z);
+
+            if (distance <= visionRadius)
             {
-                Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 2.00f);
-                Vector3 rayCastTileCoords = new Vector3(node.location.x, node.location.y, node.location.z + 2.00f);
+                Vector3 rayCastUnitCoords = new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z + 1.5f);
+                Vector3 rayCastTileCoords = new Vector3(node.location.x, node.location.y, node.location.z + 1.5f);
 
                 Ray ray = new Ray(rayCastUnitCoords, rayCastTileCoords);
                 RaycastHit hitInfo;

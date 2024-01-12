@@ -146,8 +146,8 @@ public class ItemDatabase
         longbow.minDamage = 2;
         longbow.maxDamage = 5;
         longbow.range = 5;
-        longbow.accuracy = 0.4f;
-        longbow.actionCost = 2;
+        longbow.accuracy = 0.7f;
+        longbow.actionCost = 1;
 
         longbow.levelReq = 1;
         longbow.goldCost = 100;

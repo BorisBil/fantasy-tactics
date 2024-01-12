@@ -16,6 +16,7 @@ public class GrassyHills : MonoBehaviour
 
     private Dictionary<Vector3, TileSets.GrassyHillTiles> tileTypeMap;
     private Dictionary<Vector3, GrassyHillProps> propTypeMap;
+    private Dictionary<Vector3, Tile> tileMapDict;
     
     private Dictionary<Vector3, Node> pathfindingGraph;
     private Dictionary<Vector3, TileLight> lightMap;
@@ -35,6 +36,8 @@ public class GrassyHills : MonoBehaviour
     public void GenerateMapData(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
         tileTypeMap = new Dictionary<Vector3, TileSets.GrassyHillTiles>();
+
+        List<Vector3> tilesToRemove = new List<Vector3>();
 
         for (int x = 0; x < mapSizeX; x++)
         {
@@ -58,6 +61,15 @@ public class GrassyHills : MonoBehaviour
                         tileTypeMap[new Vector3(x, y + 2, 1)] = grassyHills[0];
                         tileTypeMap[new Vector3(x + 1, y + 1, 1)] = grassyHills[0];
                         tileTypeMap[new Vector3(x + 1, y + 2, 1)] = grassyHills[0];
+
+                        if (!tileTypeMap.ContainsKey(new Vector3(x, y, 1)))
+                        {
+                            tileTypeMap[new Vector3(x, y, 0.5f)] = grassyHills[3];
+                        }
+                        if (!tileTypeMap.ContainsKey(new Vector3(x + 1, y, 1)))
+                        {
+                            tileTypeMap[new Vector3(x + 1, y, 0.5f)] = grassyHills[3];
+                        }
 
                         float rollMountainChance = Random.Range(0.0f, 1.0f);
                         if (rollMountainChance > 0.9f)
@@ -87,7 +99,7 @@ public class GrassyHills : MonoBehaviour
     }
     
     /* GENERATE PROP DATA
-     * This function is responsible for generating the random cover and props on the map
+     * This function is responsible for generating the random props on the map
      */
     public void GeneratePropData(int mapSizeX, int mapSizeY, int mapSizeZ)
     {
@@ -98,6 +110,7 @@ public class GrassyHills : MonoBehaviour
             Vector3 tileLocation = tile.Key;
 
             if (!tileTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y, tileLocation.z + 1))
+                && !tileTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y, tileLocation.z + 0.5f))
                 && !propTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y, tileLocation.z)))
             {
                 float propChance = Random.Range(0.0f, 1.0f);
@@ -139,6 +152,8 @@ public class GrassyHills : MonoBehaviour
      */
     public void GenerateMapVisual()
     {
+        tileMapDict = new Dictionary<Vector3, Tile>();
+
         propList = new List<Prop>();
 
         foreach (KeyValuePair<Vector3, TileSets.GrassyHillTiles> tileLocation in tileTypeMap)
@@ -151,6 +166,8 @@ public class GrassyHills : MonoBehaviour
             /// Setting clickable tiles based on type
             Tile clickableTile = tile.GetComponent<Tile>();
             clickableTile.tileLocation = tileLocation.Key;
+
+            tileMapDict[tileLocation.Key] = clickableTile;
 
             if (propTypeMap.ContainsKey(new Vector3(tileLocation.Key.x, tileLocation.Key.y, tileLocation.Key.z)))
             {
@@ -204,7 +221,7 @@ public class GrassyHills : MonoBehaviour
             }
 
             /// Setting "underground" nodes to be unwalkable
-            if (tileTypeMap.ContainsKey(new Vector3(newNodeLocation.x, newNodeLocation.y, newNodeLocation.z + 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(newNodeLocation.x, newNodeLocation.y, newNodeLocation.z + 1)) || tileTypeMap.ContainsKey(new Vector3(newNodeLocation.x, newNodeLocation.y, newNodeLocation.z + 0.5f)))
             {
                 pathfindingGraph[newNodeLocation].isWalkable = false;
             }
@@ -237,40 +254,77 @@ public class GrassyHills : MonoBehaviour
                 pathfindingGraph[nodeLocation].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z)]);
             }
 
-            /// Adding "steps" between higher/lower ground to the neighbors
-            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)))
+            /// Adding "steps" between higher ground and the half tiles to the neighbors
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)))
             {
-                if (pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)].isWalkable)
                 {
-                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)]);
-                    pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
 
-            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)))
             {
-                if (pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)].isWalkable)
                 {
-                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)]);
-                    pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
 
-            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)))
             {
-                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)].isWalkable)
                 {
-                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)]);
-                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
 
-            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)))
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)))
             {
-                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)].isWalkable)
+                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)].isWalkable)
                 {
-                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)]);
-                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 1)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                }
+            }
+
+            /// Adding "steps" between the half tiles to lower ground
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)))
+            {
+                if (pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)].isWalkable)
+                {
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x - 1, nodeLocation.y, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                }
+            }
+
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)))
+            {
+                if (pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)].isWalkable)
+                {
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x + 1, nodeLocation.y, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                }
+            }
+
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)))
+            {
+                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)].isWalkable)
+                {
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y - 1, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
+                }
+            }
+
+            if (tileTypeMap.ContainsKey(new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)))
+            {
+                if (pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)].isWalkable)
+                {
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)]);
+                    pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y + 1, nodeLocation.z - 0.5f)].neighbors.Add(pathfindingGraph[new Vector3(nodeLocation.x, nodeLocation.y, nodeLocation.z)]);
                 }
             }
         }
@@ -325,6 +379,152 @@ public class GrassyHills : MonoBehaviour
         }
 
         return tileLights;
+    }
+
+    public void GenerateMapCover()
+    {
+        foreach (Node node in walkableNodes)
+        {
+            Vector3 tileLocation = node.location;
+
+            tileMapDict[tileLocation].coverOnTile = new Dictionary<string, string>();
+
+            if (tileMapDict.ContainsKey(new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z)))
+            {
+                if (tileMapDict.ContainsKey(new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z + 0.5f)))
+                {
+                    if (propTypeMap.ContainsKey(new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z + 0.5f)))
+                    {
+                        tileMapDict[tileLocation].coverOnTile["West"] = "Full";
+                    }
+                    else
+                    {
+                        tileMapDict[tileLocation].coverOnTile["West"] = "Half";
+                    }
+                }
+                else if (tileMapDict.ContainsKey(new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z + 1)))
+                {
+                    tileMapDict[tileLocation].coverOnTile["West"] = "Full";
+                }
+                else if (propTypeMap.ContainsKey(new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z)))
+                {
+                    if (propTypeMap[new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z)].coverType == 1)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["West"] = "Half";
+                    }
+                    if (propTypeMap[new Vector3(tileLocation.x + 1, tileLocation.y, tileLocation.z)].coverType == 2)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["West"] = "Full";
+                    }
+                }
+                else
+                {
+                    tileMapDict[tileLocation].coverOnTile["West"] = "None";
+                }
+            }
+
+            if (tileMapDict.ContainsKey(new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z)))
+            {
+                if (tileMapDict.ContainsKey(new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z + 0.5f)))
+                {
+                    if (propTypeMap.ContainsKey(new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z + 0.5f)))
+                    {
+                        tileMapDict[tileLocation].coverOnTile["East"] = "Full";
+                    }
+                    else
+                    {
+                        tileMapDict[tileLocation].coverOnTile["East"] = "Half";
+                    }
+                }
+                else if (tileMapDict.ContainsKey(new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z + 1)))
+                {
+                    tileMapDict[tileLocation].coverOnTile["East"] = "Full";
+                }
+                else if (propTypeMap.ContainsKey(new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z)))
+                {
+                    if (propTypeMap[new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z)].coverType == 1)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["East"] = "Half";
+                    }
+                    if (propTypeMap[new Vector3(tileLocation.x - 1, tileLocation.y, tileLocation.z)].coverType == 2)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["East"] = "Full";
+                    }
+                }
+                else
+                {
+                    tileMapDict[tileLocation].coverOnTile["East"] = "None";
+                }
+            }
+
+            if (tileMapDict.ContainsKey(new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z)))
+            {
+                if (tileMapDict.ContainsKey(new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z + 0.5f)))
+                {
+                    if (propTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z + 0.5f)))
+                    {
+                        tileMapDict[tileLocation].coverOnTile["North"] = "Full";
+                    }
+                    else
+                    {
+                        tileMapDict[tileLocation].coverOnTile["North"] = "Half";
+                    }
+                }
+                else if (tileMapDict.ContainsKey(new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z + 1)))
+                {
+                    tileMapDict[tileLocation].coverOnTile["North"] = "Full";
+                }
+                else if (propTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z)))
+                {
+                    if (propTypeMap[new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z)].coverType == 1)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["North"] = "Half";
+                    }
+                    if (propTypeMap[new Vector3(tileLocation.x, tileLocation.y + 1, tileLocation.z)].coverType == 2)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["North"] = "Full";
+                    }
+                }
+                else
+                {
+                    tileMapDict[tileLocation].coverOnTile["North"] = "None";
+                }
+            }
+
+            if (tileMapDict.ContainsKey(new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z)))
+            {
+                if (tileMapDict.ContainsKey(new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z + 0.5f)))
+                {
+                    if (propTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z + 0.5f)))
+                    {
+                        tileMapDict[tileLocation].coverOnTile["South"] = "Full";
+                    }
+                    else
+                    {
+                        tileMapDict[tileLocation].coverOnTile["South"] = "Half";
+                    }
+                }
+                else if (tileMapDict.ContainsKey(new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z + 1)))
+                {
+                    tileMapDict[tileLocation].coverOnTile["South"] = "Full";
+                }
+                else if (propTypeMap.ContainsKey(new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z)))
+                {
+                    if (propTypeMap[new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z)].coverType == 1)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["South"] = "Half";
+                    }
+                    if (propTypeMap[new Vector3(tileLocation.x, tileLocation.y - 1, tileLocation.z)].coverType == 2)
+                    {
+                        tileMapDict[tileLocation].coverOnTile["South"] = "Full";
+                    }
+                }
+                else
+                {
+                    tileMapDict[tileLocation].coverOnTile["South"] = "None";
+                }
+            }
+        }
     }
 
     /// Get walkable nodes from the node dictionary

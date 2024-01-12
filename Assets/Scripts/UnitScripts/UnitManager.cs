@@ -37,7 +37,7 @@ public class UnitManager : MonoBehaviour
         unit.baseMovement = 5;
         unit.level = 1;
         unit.actionPoints = 2;
-        unit.visionRadius = 7;
+        unit.visionRadius = 5;
 
         unit.unitModel = unitModel;
         unit.unitObject = spawnedUnit;
@@ -48,6 +48,12 @@ public class UnitManager : MonoBehaviour
 
         unit.unitTeam = 1;
         unit.isSelectable = true;
+
+        unit.inCover = new Dictionary<string, string>();
+        unit.inCover["North"] = "None";
+        unit.inCover["South"] = "None";
+        unit.inCover["East"] = "None";
+        unit.inCover["West"] = "None";
 
         playerUnits.Add(unit);
 
@@ -86,6 +92,12 @@ public class UnitManager : MonoBehaviour
 
         unit.unitTeam = 2;
         unit.isSelectable = false;
+
+        unit.inCover = new Dictionary<string, string>();
+        unit.inCover["North"] = "None";
+        unit.inCover["South"] = "None";
+        unit.inCover["East"] = "None";
+        unit.inCover["West"] = "None";
 
         enemyUnits.Add(unit);
 

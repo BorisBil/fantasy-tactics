@@ -35,7 +35,7 @@ public class ItemManager : MonoBehaviour
     /// Adds items to player units
     public void GivePlayerItems(Unit unit)
     {
-        AddWeaponToUnit(unit, (Item.Weapon)itemList["Goblin Longsword"]);
+        AddWeaponToUnit(unit, (Item.Weapon)itemList["Goblin Longbow"]);
         AddArmorToUnit(unit, (Item.Armor)itemList["Goblin Chest Armor"]);
 
         unit.CalculateStats();

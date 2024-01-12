@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// 
@@ -11,6 +12,8 @@ public class Tile : MonoBehaviour
 
     public bool isRamp;
     public bool hasProp;
+
+    public Dictionary<string, string> coverOnTile;
     
     public TileMap map;
 }

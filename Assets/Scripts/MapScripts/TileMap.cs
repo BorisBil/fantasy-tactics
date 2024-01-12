@@ -30,7 +30,9 @@ public class TileMap : MonoBehaviour
         
         graph = grassyHills.GenerateMapGraph(mapSizeX, mapSizeY, mapSizeZ);
         lights = grassyHills.GenerateMapLighting(mapSizeX, mapSizeY, mapSizeZ);
-        
+        grassyHills.GenerateMapCover();
+
+
         walkableNodes = grassyHills.ReturnWalkableNodeList();
         lightsGraph = grassyHills.ReturnLightGraph();
     }

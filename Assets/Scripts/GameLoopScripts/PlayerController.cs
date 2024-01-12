@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 /// 
 /// PLAYER'S VIEW OF THE GAME
@@ -12,13 +13,34 @@ public class PlayerController : MonoBehaviour
 
     public UnitManager unitManager;
     public GameLoopController gameLoopController;
+    public ScreenSettings screenSettings;
+    public CameraManager cameraManager;
 
     public GameObject mouseOver;
     public GameObject selectedUnit;
     public GameObject selectedEnemy;
+    public GameObject cameraPivot;
 
     private Unit unit;
     private Tile tile;
+
+    private float screenWidth;
+    private float screenHeight;
+    private float screenWidthCut;
+    private float screenHeightCut;
+
+    private float xCameraModifierLeftRight;
+    private float xCameraModifierUpDown;
+    private float yCameraModifierLeftRight;
+    private float yCameraModifierUpDown;
+
+    public enum CameraRotation { North, East, South, West };
+    public CameraRotation desiredCameraRotationType;
+    public CameraRotation currentCameraRotationType = CameraRotation.North;
+
+    private Quaternion desiredCameraRotationAngle;
+
+    private float cameraRotateSpeed = 100f;
 
     private List<Node> inRangeTiles;
 
@@ -41,6 +63,19 @@ public class PlayerController : MonoBehaviour
         toMoveTo = new List<Tile>();
 
         gameLoopController.SetUpLists();
+        
+        screenSettings = new ScreenSettings();
+        screenSettings.DetermineCameraCutAxis();
+
+        screenWidth = screenSettings.screenWidth;
+        screenHeight = screenSettings.screenHeight;
+        screenWidthCut = screenSettings.screenWidthCut;
+        screenHeightCut = screenSettings.screenHeightCut;
+
+        xCameraModifierLeftRight = 1;
+        xCameraModifierUpDown = 1;
+        yCameraModifierLeftRight = 1;
+        yCameraModifierUpDown = 1;
 
         SetMoveMode();
     }
@@ -64,6 +99,65 @@ public class PlayerController : MonoBehaviour
 
         if (moveMode)
         {
+            /// CAMERA MOUSE MOVEMENT CONTROLS
+            /// /// X AXIS
+            if (Input.mousePosition.x > 0 && Input.mousePosition.x <= screenWidthCut)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x + 0.1f * xCameraModifierLeftRight, cameraPivot.transform.position.y - 0.1f * yCameraModifierLeftRight, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.05f);
+            }
+            if (Input.mousePosition.x > screenWidthCut && Input.mousePosition.x <= 2 * screenWidthCut)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x + 0.05f * xCameraModifierLeftRight, cameraPivot.transform.position.y - 0.05f * yCameraModifierLeftRight, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.025f);
+            }
+            if (Input.mousePosition.x > 6 * screenWidthCut && Input.mousePosition.x <= 7 * screenWidthCut)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x - 0.05f * xCameraModifierLeftRight, cameraPivot.transform.position.y + 0.05f * yCameraModifierLeftRight, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.025f);
+            }
+            if (Input.mousePosition.x > 7 * screenWidthCut && Input.mousePosition.x < screenWidth)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x - 0.1f * xCameraModifierLeftRight, cameraPivot.transform.position.y + 0.1f * yCameraModifierLeftRight, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.05f);
+            }
+
+            /// /// Y AXIS
+            if (Input.mousePosition.y > 0 && Input.mousePosition.y <= screenHeightCut)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x - 0.1f * xCameraModifierUpDown, cameraPivot.transform.position.y - 0.1f * yCameraModifierUpDown, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.05f);
+            }
+            if (Input.mousePosition.y > screenHeightCut && Input.mousePosition.y <= 2 * screenHeightCut)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x - 0.05f * xCameraModifierUpDown, cameraPivot.transform.position.y - 0.05f * yCameraModifierUpDown, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.025f);
+            }
+            if (Input.mousePosition.y > 6 * screenHeightCut && Input.mousePosition.y <= 7 * screenHeightCut)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x + 0.05f * xCameraModifierUpDown, cameraPivot.transform.position.y + 0.05f * yCameraModifierUpDown, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.025f);
+            }
+            if (Input.mousePosition.y > 7 * screenHeightCut && Input.mousePosition.y < screenHeight)
+            {
+                Vector3 newCameraPosition = new Vector3(cameraPivot.transform.position.x + 0.1f * xCameraModifierUpDown, cameraPivot.transform.position.y + 0.1f * yCameraModifierUpDown, cameraPivot.transform.position.z);
+                cameraPivot.transform.position = Vector3.MoveTowards(cameraPivot.transform.position, newCameraPosition, 0.05f);
+            }
+
+            if (currentCameraRotationType != desiredCameraRotationType)
+            {
+                var step = cameraRotateSpeed * Time.deltaTime;
+
+                cameraPivot.transform.rotation = Quaternion.RotateTowards(cameraPivot.transform.rotation, desiredCameraRotationAngle, step);
+
+                if (cameraPivot.transform.rotation == desiredCameraRotationAngle)
+                {
+                    cameraPivot.transform.rotation = desiredCameraRotationAngle;
+
+                    currentCameraRotationType = desiredCameraRotationType;
+                }
+            }
+
             if (Input.GetMouseButtonDown(0))
             {
                 if (mouseOver.transform.parent.gameObject == GameObject.Find("PlayerUnits"))
@@ -133,11 +227,12 @@ public class PlayerController : MonoBehaviour
                                 toMoveQ.Add(unit);
                                 toMoveTo.Add(tile);
 
+                                gameLoopController.UpdateUnitCover(unit, null);
+
                                 inRangeTiles = null;
 
                                 tileMap.graph[new Vector3(unit.unitPosition.x, unit.unitPosition.y, unit.unitPosition.z)].isWalkable = true;
                                 tileMap.graph[new Vector3(tile.tileLocation.x, tile.tileLocation.y, tile.tileLocation.z)].isWalkable = false;
-
                             }
                         }
                     }
@@ -167,6 +262,8 @@ public class PlayerController : MonoBehaviour
                     unit.currentPath = null;
                     unit.isMoving = false;
                     unit.actionPoints -= 1;
+
+                    gameLoopController.UpdateUnitCover(unit, tile);
 
                     toMoveQ.RemoveAt(0);
                     toMoveTo.RemoveAt(0);
@@ -211,6 +308,7 @@ public class PlayerController : MonoBehaviour
             else if (!isMoving && !transitionTurn)
             {
                 gameLoopController.endTurnButton.ShowButton();
+                gameLoopController.rotateCameraButton.ShowButton();
             }
         }
 
@@ -241,6 +339,57 @@ public class PlayerController : MonoBehaviour
                     selectedUnit = null;
                 }
             }
+        }
+    }
+
+    public void AddCameraRotation()
+    {
+        if (currentCameraRotationType == CameraRotation.North)
+        {
+            desiredCameraRotationType = CameraRotation.East;
+
+            desiredCameraRotationAngle = Quaternion.Euler(35f, 33f, 54f);
+
+            xCameraModifierUpDown = -1;
+            yCameraModifierLeftRight = -1;
+        }
+        
+        if (currentCameraRotationType == CameraRotation.East)
+        {
+            desiredCameraRotationType = CameraRotation.South;
+
+            desiredCameraRotationAngle = Quaternion.Euler(-35f, 33f, 125f);
+
+            xCameraModifierLeftRight = -1;
+
+            xCameraModifierUpDown = -1;
+            yCameraModifierUpDown = -1;
+        }
+        
+        if (currentCameraRotationType == CameraRotation.South)
+        {
+            desiredCameraRotationType = CameraRotation.West;
+
+            desiredCameraRotationAngle = Quaternion.Euler(-35f, -33f, 235f);
+
+            xCameraModifierLeftRight = -1;
+            yCameraModifierLeftRight = 1;
+            
+            xCameraModifierUpDown = 1;
+            yCameraModifierUpDown = -1;
+        }
+        
+        if (currentCameraRotationType == CameraRotation.West)
+        {
+            desiredCameraRotationType = CameraRotation.North;
+
+            desiredCameraRotationAngle = Quaternion.Euler(35f, -33f, -54f);
+
+            xCameraModifierLeftRight = 1;
+            yCameraModifierLeftRight = 1;
+
+            xCameraModifierUpDown = 1;
+            yCameraModifierUpDown = 1;
         }
     }
 
